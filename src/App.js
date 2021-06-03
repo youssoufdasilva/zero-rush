@@ -115,7 +115,7 @@ const App = () => {
 }
 
 const ConfirmPuzzle = (props) => {
-	const { puzzle, answers, isRushing, rushCounter, start, clear } = props
+	const { puzzle, answers, isRushing, start, clear } = props
 
 	if (puzzle === null && isRushing === false) return null
 
@@ -150,7 +150,13 @@ const ConfirmPuzzle = (props) => {
 						: 'flex flex-col justify-center items-center p-4 '
 				}
 			>
-				<div className='border-b border-white mb-4'>Status: {status}</div>
+				<div className='border-b border-white mb-4'>
+					Status: {status} (
+					{answers && answers.has_valid_ans && answers.all_answers
+						? answers.all_answers
+						: '-'}
+					)
+				</div>
 				<div>{puzzle}</div>
 				{/* <div>{answers.all_answers || 'xx'}</div> */}
 				<button
@@ -174,7 +180,8 @@ const ConfirmPuzzle = (props) => {
 			</div>
 
 			<div className={isRushing ? 'block text-center m-4' : 'hidden'}>
-				{`Rushing!  #${rushCounter}`}
+				<p>Rushing!</p>
+				<p>Please Wait...</p>
 			</div>
 		</div>
 	)

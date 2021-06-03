@@ -92,7 +92,7 @@ const generateAnswers = (puzzle) => {
 
 	// 3. Return puzzle for sunset and sunrise
 	var all_answers = Object.keys(puzzle_answers)
-	var is_good_puzzle = puzzle_permutations.length / all_answers.length <= 10,
+	var is_good_puzzle = puzzle_permutations.length / all_answers.length <= 5, // was 10 before
 		sunset = {},
 		sunrise = {}
 	// if (is_good_puzzle) {
