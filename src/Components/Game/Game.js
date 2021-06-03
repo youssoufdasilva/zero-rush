@@ -120,8 +120,21 @@ const GameScreen = (props) => {
 					<p>Total Solutions {allSolutions.length}</p>
 					<ol>
 						{allSolutions.map((this_solution, i) => {
+							const valid =
+								this_solution.solution.toString() === answers.sunset.result ||
+								this_solution.solution.toString() === answers.sunrise.result
+
+							const invalid =
+								this_solution.solution.toString().charAt(0) === '-' ||
+								this_solution.solution.toString().split('.').length > 1
+
 							return (
-								<li key={i}>
+								<li
+									key={i}
+									className={
+										valid ? 'text-green-500' : invalid ? 'text-red-500' : null
+									}
+								>
 									{this_solution.attempt} = {this_solution.solution}
 								</li>
 							)
