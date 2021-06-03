@@ -31,16 +31,19 @@ const App = () => {
 			if (my_answer_obj !== null && my_answer_obj.has_valid_ans) {
 				console.log('Checking ', my_answer_obj)
 
-				if (my_answer_obj.is_good && my_answer_obj.has_zero) {
+				let has_zero = my_answer_obj.sunset.result === '0'
+
+				if (my_answer_obj.is_good && has_zero) {
 					console.log('Good and has Zero Found it at ', i)
 					setGeneratedPuzzle(my_puzzle_string)
 					setGeneratedAnswers(my_answer_obj)
+					setIsRushing(false)
 					break
-				} else if (my_answer_obj.has_zero) {
+				} else if (has_zero) {
 					console.log('>>>>>>> Has Zero Found at ', i)
 					setGeneratedPuzzle(my_puzzle_string)
 					setGeneratedAnswers(my_answer_obj)
-					break
+					// break
 				} else if (my_answer_obj.is_good) {
 					console.log('Just Good Found at ', i)
 					setGeneratedPuzzle(my_puzzle_string)
@@ -53,13 +56,14 @@ const App = () => {
 
 	const searchPuzzle = () => {
 		// console.log('Starting game...')
+		setIsRushing(false)
 
 		let my_puzzle_string = generatePuzzle()
-		// console.log('my_puzzle_string ', my_puzzle_string)
+		console.log('my_puzzle_string ', my_puzzle_string)
 		setGeneratedPuzzle(my_puzzle_string)
 
 		let my_answer_obj = generateAnswers(my_puzzle_string.split(','))
-		// console.log('my_answer_obj ', my_answer_obj)
+		console.log('my_answer_obj ', my_answer_obj)
 		setGeneratedAnswers(my_answer_obj)
 	}
 
@@ -75,7 +79,7 @@ const App = () => {
 					setIsRushing(true)
 					setTimeout(() => {
 						setGeneratedPuzzle(null)
-						findGoodPuzzleWithZero(10000)
+						findGoodPuzzleWithZero(100)
 					}, 100)
 				}}
 				isRushing={isRushing}
@@ -85,6 +89,10 @@ const App = () => {
 					answers={generatedAnswers}
 					start={() => {
 						startGame()
+					}}
+					clear={() => {
+						setGeneratedPuzzle(null)
+						setGeneratedAnswers(null)
 					}}
 					isRushing={isRushing}
 					rushCounter={rushCounter}
@@ -96,6 +104,8 @@ const App = () => {
 				answers={generatedAnswers}
 				visible={showGame}
 				back={() => {
+					setGeneratedPuzzle(null)
+					setGeneratedAnswers(null)
 					setShowWelcome(true)
 					setShowGame(false)
 				}}
@@ -105,19 +115,20 @@ const App = () => {
 }
 
 const ConfirmPuzzle = (props) => {
-	const { puzzle, answers, isRushing, rushCounter, start } = props
+	const { puzzle, answers, isRushing, rushCounter, start, clear } = props
 
 	if (puzzle === null && isRushing === false) return null
 
 	let status, custom_style
 	if (answers !== null && answers.has_valid_ans) {
-		if (answers.has_zero) {
+		let has_zero = answers.sunset.result === '0'
+		if (has_zero) {
 			custom_style = 'border-4 border-green-500'
 			status = 'Has Zero!'
 		} else if (answers.is_good) {
 			custom_style = 'border-4 border-yellow-500'
 			status = 'Decent!'
-		} else if (answers.is_good && answers.has_zero) {
+		} else if (answers.is_good && has_zero) {
 			custom_style = 'border-4 border-green-500 bg-green-500'
 			status = "Let's Go!"
 		} else {
@@ -151,6 +162,14 @@ const ConfirmPuzzle = (props) => {
 					}}
 				>
 					Start Game
+				</button>
+				<button
+					className='text-white px-4 py-1 text-xs mt-2'
+					onClick={() => {
+						clear()
+					}}
+				>
+					Clear Puzzle
 				</button>
 			</div>
 
