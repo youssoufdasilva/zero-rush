@@ -122,26 +122,26 @@ const ConfirmPuzzle = (props) => {
 	let status, custom_style
 	if (answers !== null && answers.has_valid_ans) {
 		let has_zero = answers.sunset.result === '0'
-		if (has_zero) {
-			custom_style = 'border-4 border-green-500'
-			status = 'Has Zero!'
+		if (answers.is_good && has_zero) {
+			custom_style = 'border-4 border-green-500 bg-green-500'
+			status = "Let's Go!"
 		} else if (answers.is_good) {
 			custom_style = 'border-4 border-yellow-500'
 			status = 'Decent!'
-		} else if (answers.is_good && has_zero) {
-			custom_style = 'border-4 border-green-500 bg-green-500'
-			status = "Let's Go!"
+		} else if (has_zero) {
+			custom_style = 'border-4 border-green-500'
+			status = 'Has Zero!'
 		} else {
 			custom_style = 'border-4 border-yellow-200 bg-green-500'
 			status = 'Meh!'
 		}
 	} else {
 		custom_style = 'border-4 border-red-500'
-		status = 'X - Nope! - X'
+		status = 'Nope!'
 	}
 	return (
 		<div
-			className={`w-1/2 bg-purple-800 rounded-xl shadow-xl text-white mx-auto my-4 ${custom_style}`}
+			className={`min-w-1/2 w-1/2x px-4 bg-purple-800 rounded-xl shadow-xl text-white mx-auto my-4 ${custom_style}`}
 		>
 			<div
 				className={
