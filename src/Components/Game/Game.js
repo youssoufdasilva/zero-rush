@@ -194,7 +194,7 @@ const GameScreen = (props) => {
 					</button>
 				</div>
 			) : (
-				<div className='flex gap-2 mb-4 border-white'>
+				<div className='flex gap-2 mb-16 border-white'>
 					{/* Hand */}
 					{puzzle !== null
 						? puzzle.split(',').map((card, i) => {
