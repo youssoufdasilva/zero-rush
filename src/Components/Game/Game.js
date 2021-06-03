@@ -194,7 +194,7 @@ const GameScreen = (props) => {
 					</button>
 				</div>
 			) : (
-				<div className='flex gap-3 mb-4 border-white'>
+				<div className='flex gap-2 mb-4 border-white'>
 					{/* Hand */}
 					{puzzle !== null
 						? puzzle.split(',').map((card, i) => {
@@ -209,7 +209,7 @@ const GameScreen = (props) => {
 										}}
 										className={`${
 											card_available ? 'bg-white' : 'bg-gray-400'
-										} p-4 rounded border-2`}
+										} p-3 rounded border-2`}
 									>
 										{card}
 									</div>
@@ -239,14 +239,14 @@ const TopBar = (props) => {
 				Back
 			</button>
 
-			<p>
-				ZERO RUSH
-				<span className='opacity-50'>
-					{' '}
+			<div className='flex flex-wrap justify-center gap-x-2'>
+				<p>ZERO RUSH</p>
+
+				<p className='opacity-50'>
 					({my_answers.has_valid_ans ? my_answers.sunset.result : '-'} {' & '}
 					{my_answers.has_valid_ans ? my_answers.sunrise.result : '-'})
-				</span>
-			</p>
+				</p>
+			</div>
 			<button
 				onClick={() => {
 					pause()
