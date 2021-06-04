@@ -9,6 +9,7 @@ const GameScreen = (props) => {
 	const [currentAttempt, setCurrentAttempt] = useState([])
 	const [currentSolution, setCurrentSolution] = useState({ answer: '-' })
 	const [allSolutions, setAllSolutions] = useState([])
+	const [showingHint, setShowingHint] = useState(false)
 
 	if (puzzle === null) {
 		back()
@@ -81,8 +82,10 @@ const GameScreen = (props) => {
 					setAllSolutions([])
 					back()
 				}}
-				pause={() => {
-					alert('pause game')
+				showingHint={showingHint}
+				toggleHint={() => {
+					// alert('pause game')
+					setShowingHint(!showingHint)
 				}}
 				answers={answers}
 			/>
@@ -109,7 +112,31 @@ const GameScreen = (props) => {
 					: null}
 			</div>
 
-			<div className='flex flex-row'>
+			<div className='flex flex-col'>
+				<div
+					style={
+						allSolutions.length === 10
+							? { display: 'none' }
+							: { display: 'flex' }
+					}
+					className=' flex-col flex-wrap items-center gap-4'
+				>
+					<p className='text-2xl'>Solution: {currentSolution.answer}</p>
+					<button
+						className={
+							currentAttempt.length > 0
+								? 'bg-purple-800 px-2 m-1 rounded font-bold text-white'
+								: 'hidden'
+						}
+						onClick={() => {
+							setCurrentAttempt([])
+							setCurrentSolution({ answer: '-' })
+							// window.location.reload(false)
+						}}
+					>
+						Clear
+					</button>
+				</div>
 				<div
 					className={
 						allSolutions.length === 0
@@ -140,30 +167,6 @@ const GameScreen = (props) => {
 							)
 						})}
 					</ol>
-				</div>
-				<div
-					style={
-						allSolutions.length === 10
-							? { display: 'none' }
-							: { display: 'flex' }
-					}
-					className=' flex-col flex-wrap items-center gap-4'
-				>
-					<p className='text-2xl'>Solution: {currentSolution.answer}</p>
-					<button
-						className={
-							currentAttempt.length > 0
-								? 'bg-purple-800 p-2 rounded font-bold text-white'
-								: 'hidden'
-						}
-						onClick={() => {
-							setCurrentAttempt([])
-							setCurrentSolution({ answer: '-' })
-							// window.location.reload(false)
-						}}
-					>
-						Clear
-					</button>
 				</div>
 			</div>
 
@@ -199,6 +202,12 @@ const GameScreen = (props) => {
 					{puzzle !== null
 						? puzzle.split(',').map((card, i) => {
 								let card_available = currentAttempt.indexOf(card) === -1
+
+								let sunset_hint =
+									showingHint && card === answers.sunset.answer[0]
+								let sunrise_hint =
+									showingHint && card === answers.sunrise.answer[0]
+
 								return (
 									<div
 										key={`${card}-${i}`}
@@ -209,7 +218,13 @@ const GameScreen = (props) => {
 										}}
 										className={`${
 											card_available ? 'bg-white' : 'bg-gray-400'
-										} p-3 rounded border-2`}
+										} p-3 rounded border-4 ${
+											sunrise_hint
+												? 'border-green-400'
+												: sunset_hint
+												? 'border-blue-400'
+												: 'border-white'
+										}`}
 									>
 										{card}
 									</div>
@@ -223,38 +238,86 @@ const GameScreen = (props) => {
 }
 
 const TopBar = (props) => {
-	const { back, pause, answers } = props
+	const { back, toggleHint, showingHint, answers } = props
 
 	let my_answers = answers || { has_valid_ans: false }
 
+	const [showSolutions, setShowSolutions] = useState(false)
+
 	return (
-		<div className='w-full bg-purple-700 text-white rounded-b shadow-lg flex justify-between items-center p-2'>
-			{/* Navbar */}
-			<button
-				onClick={() => {
-					back()
-				}}
-				className='inline-block px-8 py-1 rounded bg-purple-500 text-white font-bold'
-			>
-				Back
-			</button>
+		<div className='w-full'>
+			<div className='w-full bg-purple-700 text-white rounded-b shadow-lg flex justify-between items-center p-2'>
+				{/* Navbar */}
+				<button
+					onClick={() => {
+						let confirm_response = window.confirm('Going Back?')
+						if (confirm_response) back()
+					}}
+					className='inline-block px-8 py-1 rounded bg-purple-500 text-white font-bold'
+				>
+					Back
+				</button>
 
-			<div className='flex flex-wrap justify-center gap-x-2'>
-				<p>ZERO RUSH</p>
+				<div className='flex flex-wrap justify-center gap-x-2'>
+					<p
+						onClick={() => {
+							let confirm_response = window.confirm(
+								showSolutions ? 'Hide Solutions?' : 'Show Solutions?'
+							)
+							if (confirm_response) setShowSolutions(!showSolutions)
+						}}
+					>
+						ZERO RUSH
+					</p>
 
-				<p className='opacity-50'>
-					({my_answers.has_valid_ans ? my_answers.sunset.result : '-'} {' & '}
-					{my_answers.has_valid_ans ? my_answers.sunrise.result : '-'})
-				</p>
+					<p className='opacity-50 hidden'>
+						({my_answers.has_valid_ans ? my_answers.sunset.result : '-'} {' & '}
+						{my_answers.has_valid_ans ? my_answers.sunrise.result : '-'})
+					</p>
+				</div>
+				<button
+					onClick={() => {
+						toggleHint()
+					}}
+					className='inline-block py-1 w-32 rounded bg-purple-500 text-white font-bold'
+				>
+					{showingHint ? 'Hide Hint' : 'Show Hint'}
+				</button>
 			</div>
-			<button
-				onClick={() => {
-					pause()
-				}}
-				className='inline-block px-8 py-1 rounded bg-purple-500 text-white font-bold'
+			<div
+				className={`w-full flex flex-row justify-center items-center p-1 gap-1 ${
+					showingHint ? 'opacity-100' : 'opacity-50'
+				}`}
 			>
-				00:00
-			</button>
+				<span className='bg-green-800 py-1 px-3 text-white font-bold rounded-lg text-center'>
+					<p>
+						Sunset: {my_answers.has_valid_ans ? my_answers.sunset.result : '-'}
+					</p>
+					{showSolutions
+						? my_answers.has_valid_ans
+							? my_answers.sunset.answer
+									.toString()
+									.substring(1, my_answers.sunset.answer.toString().length)
+							: '-'
+						: null}
+				</span>
+				<span className='bg-blue-800 py-1 px-3 text-white font-bold rounded-lg text-center'>
+					<p>
+						Sunrise:
+						{my_answers.has_valid_ans ? my_answers.sunrise.result : '-'}
+					</p>
+					{showSolutions
+						? my_answers.has_valid_ans
+							? my_answers.sunrise.answer
+									.toString()
+									.substring(1, my_answers.sunrise.answer.toString().length)
+							: '-'
+						: null}
+				</span>
+				{/* <p className='bg-blue-800 py-1 px-3 text-white font-bold rounded-lg'>
+					Sunrise {my_answers.has_valid_ans ? my_answers.Sunrise.result : '-'}
+				</p> */}
+			</div>
 		</div>
 	)
 }
