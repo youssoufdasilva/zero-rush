@@ -33,22 +33,25 @@ const GameScreen = (props) => {
 		console.log('SOLUTION = ', temp_solution)
 
 		if (temp_attempt.length === puzzle.split(',').length) {
-			let temp_all_sols = allSolutions
-			let temp_att_string = temp_attempt.toString()
-			temp_all_sols.push({
-				attempt: temp_att_string.substring(1, temp_att_string.length),
-				solution: Math.round(temp_solution.answer * 100) / 100,
-			})
-			setAllSolutions(temp_all_sols)
-			setCurrentAttempt([])
-			setCurrentSolution({ answer: '-' })
+			// wait 1 second
+			setTimeout(() => {
+				let temp_all_sols = allSolutions
+				let temp_att_string = temp_attempt.toString()
+				temp_all_sols.push({
+					attempt: temp_att_string.substring(1, temp_att_string.length),
+					solution: Math.round(temp_solution.answer * 100) / 100,
+				})
+				setAllSolutions(temp_all_sols)
+				setCurrentAttempt([])
+				setCurrentSolution({ answer: '-' })
 
-			if (
-				temp_solution.answer.toString() === answers.sunset.result ||
-				temp_solution.answer.toString() === answers.sunrise.result
-			) {
-				alert('Congratulations')
-			}
+				if (
+					temp_solution.answer.toString() === answers.sunset.result ||
+					temp_solution.answer.toString() === answers.sunrise.result
+				) {
+					alert('Congratulations')
+				}
+			}, 1000)
 		}
 		// }
 	}
@@ -149,9 +152,11 @@ const GameScreen = (props) => {
 			>
 				<p>Total Solutions {allSolutions.length}</p>
 				<ol>
-					{allSolutions.map((this_solution, i) => {
-						const valid =
-							this_solution.solution.toString() === answers.sunset.result ||
+					{allSolutions.reverse().map((this_solution, i) => {
+						const valid_sunset =
+							this_solution.solution.toString() === answers.sunset.result
+
+						const valid_sunrise =
 							this_solution.solution.toString() === answers.sunrise.result
 
 						const invalid =
@@ -162,10 +167,17 @@ const GameScreen = (props) => {
 							<li
 								key={i}
 								className={
-									valid ? 'text-green-500' : invalid ? 'text-red-500' : null
+									valid_sunset
+										? 'text-green-500'
+										: valid_sunrise
+										? 'text-blue-500'
+										: invalid
+										? 'text-red-500'
+										: null
 								}
 							>
-								{this_solution.attempt} = {this_solution.solution}
+								({i + 1}) {'=>'} {this_solution.attempt} ={' '}
+								{this_solution.solution}
 							</li>
 						)
 					})}
@@ -222,9 +234,9 @@ const GameScreen = (props) => {
 											card_available ? 'bg-white' : 'bg-gray-400'
 										} p-2 rounded border-4 ${
 											sunrise_hint
-												? 'border-green-400'
-												: sunset_hint
 												? 'border-blue-400'
+												: sunset_hint
+												? 'border-green-400'
 												: 'border-white'
 										}`}
 									>
