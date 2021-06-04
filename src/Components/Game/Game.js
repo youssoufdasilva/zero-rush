@@ -253,7 +253,7 @@ const TopBar = (props) => {
 						let confirm_response = window.confirm('Going Back?')
 						if (confirm_response) back()
 					}}
-					className='inline-block px-8 py-1 rounded bg-purple-500 text-white font-bold'
+					className='inline-block w-24 py-1 rounded bg-purple-500 text-white font-bold'
 				>
 					Back
 				</button>
@@ -279,7 +279,7 @@ const TopBar = (props) => {
 					onClick={() => {
 						toggleHint()
 					}}
-					className='inline-block py-1 w-32 rounded bg-purple-500 text-white font-bold'
+					className='inline-block py-1 w-24 rounded bg-purple-500 text-white font-bold'
 				>
 					{showingHint ? 'Hide Hint' : 'Show Hint'}
 				</button>
