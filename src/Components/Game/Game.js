@@ -90,28 +90,6 @@ const GameScreen = (props) => {
 				answers={answers}
 			/>
 
-			<div
-				style={
-					allSolutions.length === 10 ? { display: 'none' } : { display: 'flex' }
-				}
-				className={` gap-3 mb-4 border-white`}
-			>
-				{/* Attempt */}
-				{currentAttempt !== []
-					? currentAttempt.map((card, i) => {
-							return (
-								<div
-									key={`${card}-${i}`}
-									onClick={() => moveToHand(card)}
-									className='bg-white p-4 rounded border-2'
-								>
-									{card}
-								</div>
-							)
-					  })
-					: null}
-			</div>
-
 			<div className='flex flex-col'>
 				<div
 					style={
@@ -119,13 +97,37 @@ const GameScreen = (props) => {
 							? { display: 'none' }
 							: { display: 'flex' }
 					}
-					className=' flex-col flex-wrap items-center gap-4'
+					className={` gap-2 mb-4 border-white`}
+				>
+					{/* Attempt */}
+					{currentAttempt !== []
+						? currentAttempt.map((card, i) => {
+								return (
+									<div
+										key={`${card}-${i}`}
+										onClick={() => moveToHand(card)}
+										className='bg-white w-12 h-12 flex justify-center items-center rounded-full border-2'
+									>
+										{card}
+									</div>
+								)
+						  })
+						: null}
+				</div>
+
+				<div
+					style={
+						allSolutions.length === 10
+							? { display: 'none' }
+							: { display: 'flex' }
+					}
+					className=' flex-col flex-wrap items-center gap-2'
 				>
 					<p className='text-2xl'>Solution: {currentSolution.answer}</p>
 					<button
 						className={
 							currentAttempt.length > 0
-								? 'bg-purple-800 px-2 m-1 rounded font-bold text-white'
+								? 'bg-purple-800 px-2 mb-4 rounded font-bold text-white'
 								: 'hidden'
 						}
 						onClick={() => {
@@ -137,37 +139,37 @@ const GameScreen = (props) => {
 						Clear
 					</button>
 				</div>
-				<div
-					className={
-						allSolutions.length === 0
-							? 'hidden'
-							: 'flex flex-col flex-wrap items-center gap-4 p-4 border border-black rounded mx-4 text-xs'
-					}
-				>
-					<p>Total Solutions {allSolutions.length}</p>
-					<ol>
-						{allSolutions.map((this_solution, i) => {
-							const valid =
-								this_solution.solution.toString() === answers.sunset.result ||
-								this_solution.solution.toString() === answers.sunrise.result
+			</div>
+			<div
+				className={
+					allSolutions.length === 0
+						? 'hidden'
+						: 'flex flex-col flex-wrap items-center gap-4 p-4 border border-black rounded mx-4 text-xs'
+				}
+			>
+				<p>Total Solutions {allSolutions.length}</p>
+				<ol>
+					{allSolutions.map((this_solution, i) => {
+						const valid =
+							this_solution.solution.toString() === answers.sunset.result ||
+							this_solution.solution.toString() === answers.sunrise.result
 
-							const invalid =
-								this_solution.solution.toString().charAt(0) === '-' ||
-								this_solution.solution.toString().split('.').length > 1
+						const invalid =
+							this_solution.solution.toString().charAt(0) === '-' ||
+							this_solution.solution.toString().split('.').length > 1
 
-							return (
-								<li
-									key={i}
-									className={
-										valid ? 'text-green-500' : invalid ? 'text-red-500' : null
-									}
-								>
-									{this_solution.attempt} = {this_solution.solution}
-								</li>
-							)
-						})}
-					</ol>
-				</div>
+						return (
+							<li
+								key={i}
+								className={
+									valid ? 'text-green-500' : invalid ? 'text-red-500' : null
+								}
+							>
+								{this_solution.attempt} = {this_solution.solution}
+							</li>
+						)
+					})}
+				</ol>
 			</div>
 
 			{allSolutions.length === 10 ? (
@@ -197,7 +199,7 @@ const GameScreen = (props) => {
 					</button>
 				</div>
 			) : (
-				<div className='flex gap-2 mb-16 border-white'>
+				<div className='flex gap-1 mb-16 border-white'>
 					{/* Hand */}
 					{puzzle !== null
 						? puzzle.split(',').map((card, i) => {
@@ -218,7 +220,7 @@ const GameScreen = (props) => {
 										}}
 										className={`${
 											card_available ? 'bg-white' : 'bg-gray-400'
-										} p-3 rounded border-4 ${
+										} p-2 rounded border-4 ${
 											sunrise_hint
 												? 'border-green-400'
 												: sunset_hint
@@ -285,7 +287,7 @@ const TopBar = (props) => {
 				</button>
 			</div>
 			<div
-				className={`w-full flex flex-row justify-center items-center p-1 gap-1 ${
+				className={`w-full flex flex-row flex-wrap justify-center items-center p-1 gap-1 ${
 					showingHint ? 'opacity-100' : 'opacity-50'
 				}`}
 			>
