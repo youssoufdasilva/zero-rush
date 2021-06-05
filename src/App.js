@@ -117,6 +117,8 @@ const App = () => {
 const ConfirmPuzzle = (props) => {
 	const { puzzle, answers, isRushing, start, clear } = props
 
+	const [showingStats, setShowingStats] = useState(false)
+
 	if (puzzle === null && isRushing === false) return null
 
 	let status, custom_style
@@ -150,12 +152,29 @@ const ConfirmPuzzle = (props) => {
 						: 'flex flex-col justify-center items-center p-4 '
 				}
 			>
-				<div className='border-b border-white mb-4'>
-					Status: {status} (
-					{answers && answers.has_valid_ans && answers.all_answers
-						? answers.all_answers
-						: '-'}
-					)
+				<div
+					className='text-center bg-purple-100 p-1 rounded text-black'
+					onClick={() => setShowingStats(!showingStats)}
+				>
+					<p className='border-b border-black mb-4'>
+						Status: {status} (
+						{answers && answers.has_valid_ans && answers.all_answers
+							? answers.all_answers
+							: '-'}
+						)
+					</p>
+					{showingStats ? (
+						<div className=''>
+							<p>Statistics</p>
+							<p>
+								Answers:{' '}
+								{`${answers ? answers.all_answers : '-'} / ${
+									answers ? answers.all_permutations : '-'
+								}`}
+							</p>
+							<p>Lowest: {`${answers ? answers.sunset.result : '-'}`}</p>
+						</div>
+					) : null}
 				</div>
 				<div>{puzzle}</div>
 				{/* <div>{answers.all_answers || 'xx'}</div> */}

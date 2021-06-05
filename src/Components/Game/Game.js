@@ -81,6 +81,7 @@ const GameScreen = (props) => {
 			className='h-screen flex-col justify-between items-center font-bold w-full bg-purple-200'
 		>
 			<TopBar
+				totalSolutions={allSolutions.length}
 				back={() => {
 					setAllSolutions([])
 					back()
@@ -111,7 +112,7 @@ const GameScreen = (props) => {
 										onClick={() => moveToHand(card)}
 										className='bg-white w-12 h-12 flex justify-center items-center rounded-full border-2'
 									>
-										{card}
+										{i !== 0 ? card : card.substring(1, card.length)}
 									</div>
 								)
 						  })
@@ -252,7 +253,7 @@ const GameScreen = (props) => {
 }
 
 const TopBar = (props) => {
-	const { back, toggleHint, showingHint, answers } = props
+	const { back, toggleHint, showingHint, answers, totalSolutions } = props
 
 	let my_answers = answers || { has_valid_ans: false }
 
@@ -275,18 +276,17 @@ const TopBar = (props) => {
 				<div className='flex flex-wrap justify-center gap-x-2'>
 					<p
 						onClick={() => {
-							let confirm_response = window.confirm(
-								showSolutions ? 'Hide Solutions?' : 'Show Solutions?'
-							)
-							if (confirm_response) setShowSolutions(!showSolutions)
+							if (totalSolutions < 2) {
+								alert('You need at least 2 tries...')
+							} else {
+								let confirm_response = window.confirm(
+									showSolutions ? 'Hide Solutions?' : 'Show Solutions?'
+								)
+								if (confirm_response) setShowSolutions(!showSolutions)
+							}
 						}}
 					>
 						ZERO RUSH
-					</p>
-
-					<p className='opacity-50 hidden'>
-						({my_answers.has_valid_ans ? my_answers.sunset.result : '-'} {' & '}
-						{my_answers.has_valid_ans ? my_answers.sunrise.result : '-'})
 					</p>
 				</div>
 				<button
@@ -305,7 +305,7 @@ const TopBar = (props) => {
 			>
 				<span className='bg-green-800 py-1 px-3 text-white font-bold rounded-lg text-center'>
 					<p>
-						Sunset: {my_answers.has_valid_ans ? my_answers.sunset.result : '-'}
+						Lowest: {my_answers.has_valid_ans ? my_answers.sunset.result : '-'}
 					</p>
 					{showSolutions
 						? my_answers.has_valid_ans
@@ -317,7 +317,7 @@ const TopBar = (props) => {
 				</span>
 				<span className='bg-blue-800 py-1 px-3 text-white font-bold rounded-lg text-center'>
 					<p>
-						Sunrise:
+						Highest:
 						{my_answers.has_valid_ans ? my_answers.sunrise.result : '-'}
 					</p>
 					{showSolutions
