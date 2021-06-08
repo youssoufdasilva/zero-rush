@@ -166,7 +166,11 @@ const ConfirmPuzzle = (props) => {
 						: 'flex flex-col justify-center items-center p-4 '
 				}
 			>
-				{rushFound ? <p className='mb-2'>Easier Puzzle Found!</p> : null}
+				{rushFound ? (
+					<p className='mb-2'>Easier Puzzle Found!</p>
+				) : (
+					<p className='mb-2'>Random Puzzle!</p>
+				)}
 				<div
 					className='text-center bg-purple-100 p-1 rounded text-black mb-4'
 					onClick={() => setShowingStats(!showingStats)}
@@ -262,7 +266,7 @@ const WelcomeScreen = (props) => {
 							: 'hidden'
 					}
 				>
-					Generate Puzzle
+					Random Puzzle
 				</button>
 
 				<button
