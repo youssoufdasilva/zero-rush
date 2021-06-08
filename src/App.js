@@ -10,7 +10,7 @@ const App = () => {
 	const [generatedAnswers, setGeneratedAnswers] = useState(null)
 	const [isRushing, setIsRushing] = useState(false)
 	// const [rushCounter, setRushCounter] = useState(false)
-	const [stopRush, setStopRush] = useState(false)
+	const [rushFound, setRushFound] = useState(false)
 
 	const startGame = () => {
 		setShowGame(true)
@@ -18,11 +18,14 @@ const App = () => {
 	}
 
 	const findGoodPuzzleWithZero = (limit = 100) => {
+		setGeneratedPuzzle(null)
+		setGeneratedAnswers(null)
+
 		for (let i = 0; i < limit; ++i) {
-			if (stopRush) {
-				alert('breakkk')
-				break
-			}
+			// if (stopRush) {
+			// 	alert('breakkk')
+			// 	break
+			// }
 
 			console.log('Attempt #', i)
 
@@ -38,6 +41,7 @@ const App = () => {
 					console.log('>  Good and has Zero Found at ', i)
 					setGeneratedPuzzle(my_puzzle_string)
 					setGeneratedAnswers(my_answer_obj)
+					setRushFound(true)
 					setIsRushing(false)
 					break
 				} else {
@@ -54,12 +58,13 @@ const App = () => {
 				break
 			}
 		}
-		setStopRush(false)
+		// setStopRush(false)
 	}
 
 	const searchPuzzle = () => {
 		// console.log('Starting game...')
 		setIsRushing(false)
+		setRushFound(false)
 
 		let my_puzzle_string = generatePuzzle()
 		console.log('my_puzzle_string ', my_puzzle_string)
@@ -87,23 +92,22 @@ const App = () => {
 				}}
 				isRushing={isRushing}
 			>
-				<ConfirmPuzzle
-					puzzle={generatedPuzzle}
-					answers={generatedAnswers}
-					start={() => {
-						startGame()
-					}}
-					clear={() => {
-						setGeneratedPuzzle(null)
-						setGeneratedAnswers(null)
-					}}
-					isRushing={isRushing}
-					// usedRush={usedRush}
-					stopRush={() => {
-						console.warn('Stopping Rush')
-						setStopRush(true)
-					}}
-				/>
+				<React.Fragment>
+					{/* {isRushing} */}
+					<ConfirmPuzzle
+						puzzle={generatedPuzzle}
+						answers={generatedAnswers}
+						start={() => {
+							startGame()
+						}}
+						clear={() => {
+							setGeneratedPuzzle(null)
+							setGeneratedAnswers(null)
+						}}
+						isRushing={isRushing}
+						rushFound={rushFound}
+					/>
+				</React.Fragment>
 			</WelcomeScreen>
 
 			<GameScreen
@@ -125,7 +129,7 @@ const App = () => {
 }
 
 const ConfirmPuzzle = (props) => {
-	const { puzzle, answers, start, clear, isRushing, stopRush } = props
+	const { puzzle, answers, start, clear, isRushing, rushFound } = props
 
 	const [showingStats, setShowingStats] = useState(false)
 
@@ -162,6 +166,7 @@ const ConfirmPuzzle = (props) => {
 						: 'flex flex-col justify-center items-center p-4 '
 				}
 			>
+				{rushFound ? <p className='mb-2'>Easier Puzzle Found!</p> : null}
 				<div
 					className='text-center bg-purple-100 p-1 rounded text-black mb-4'
 					onClick={() => setShowingStats(!showingStats)}
@@ -225,19 +230,12 @@ const ConfirmPuzzle = (props) => {
 					onClick={() => {
 						alert('test')
 					}}
+					className={isRushing ? 'animate__animated animate__rubberBand' : ''}
 				>
-					Rushing!
+					Loading!
 				</p>
-				<p>Please Wait...</p>
-				<button
-					className='text-purple-800 bg-white rounded px-4 py-1 font-bold mt-6'
-					onClick={() => {
-						alert('stopping...')
-						stopRush()
-					}}
-				>
-					Stop Rush
-				</button>
+				<p>Rush = Easier</p>
+				<p className='mt-2'>Please Wait...</p>
 			</div>
 		</div>
 	)
