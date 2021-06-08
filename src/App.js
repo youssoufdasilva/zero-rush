@@ -109,6 +109,9 @@ const App = () => {
 					setShowWelcome(true)
 					setShowGame(false)
 				}}
+				search={() => {
+					searchPuzzle()
+				}}
 			/>
 		</div>
 	)
@@ -153,19 +156,17 @@ const ConfirmPuzzle = (props) => {
 				}
 			>
 				<div
-					className='text-center bg-purple-100 p-1 rounded text-black'
+					className='text-center bg-purple-100 p-1 rounded text-black mb-4'
 					onClick={() => setShowingStats(!showingStats)}
 				>
-					<p className='border-b border-black mb-4'>
-						Status: {status} (
-						{answers && answers.has_valid_ans && answers.all_answers
-							? answers.all_answers
-							: '-'}
-						)
+					<p className='border-b border-black'>
+						{`#${answers ? answers.all_answers : '-'} | [↓ ${
+							answers ? answers.sunset.result : '-'
+						},↑ ${answers ? answers.sunrise.result : '-'}]`}
 					</p>
+
 					{showingStats ? (
 						<div className=''>
-							<p>Statistics</p>
 							<p>
 								Answers:{' '}
 								{`${answers ? answers.all_answers : '-'} / ${
@@ -173,6 +174,14 @@ const ConfirmPuzzle = (props) => {
 								}`}
 							</p>
 							<p>Lowest: {`${answers ? answers.sunset.result : '-'}`}</p>
+							<p>Highest: {`${answers ? answers.sunrise.result : '-'}`}</p>
+							<p>
+								Status: {status} (
+								{answers && answers.has_valid_ans && answers.all_answers
+									? answers.all_answers
+									: '-'}
+								)
+							</p>
 						</div>
 					) : null}
 				</div>

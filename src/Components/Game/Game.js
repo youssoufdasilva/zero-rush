@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { solvePuzzle } from './GameHelpers'
 
 const GameScreen = (props) => {
-	const { puzzle, answers, visible, back } = props
+	const { puzzle, answers, visible, back, search } = props
 
 	// const currentHand = visible && puzzle !== null ? puzzle.split(',') : []
 
@@ -10,6 +10,7 @@ const GameScreen = (props) => {
 	const [currentSolution, setCurrentSolution] = useState({ answer: '-' })
 	const [allSolutions, setAllSolutions] = useState([])
 	const [showingHint, setShowingHint] = useState(false)
+	const [foundAnswers, setFoundAnswers] = useState([false, false])
 
 	if (puzzle === null) {
 		back()
@@ -45,11 +46,20 @@ const GameScreen = (props) => {
 				setCurrentAttempt([])
 				setCurrentSolution({ answer: '-' })
 
-				if (
-					temp_solution.answer.toString() === answers.sunset.result ||
-					temp_solution.answer.toString() === answers.sunrise.result
-				) {
-					alert('Congratulations')
+				if (temp_solution.answer.toString() === answers.sunset.result) {
+					let temp_found_answers = foundAnswers
+					temp_found_answers[0] = true
+					setFoundAnswers(temp_found_answers)
+					alert('Congratulations On Finding the LOWEST Possible Valid Answer! ')
+				}
+
+				if (temp_solution.answer.toString() === answers.sunrise.result) {
+					let temp_found_answers = foundAnswers
+					temp_found_answers[1] = true
+					setFoundAnswers(temp_found_answers)
+					alert(
+						'Congratulations On Finding the HIGHEST Possible Valid Answer! '
+					)
 				}
 			}, 1000)
 		}
@@ -84,6 +94,7 @@ const GameScreen = (props) => {
 				totalSolutions={allSolutions.length}
 				back={() => {
 					setAllSolutions([])
+					setCurrentAttempt([])
 					back()
 				}}
 				showingHint={showingHint}
@@ -136,7 +147,7 @@ const GameScreen = (props) => {
 						}
 						onClick={() => {
 							setCurrentAttempt([])
-							setCurrentSolution({ answer: '-' })
+							setCurrentSolution({ answer: '0' })
 							// window.location.reload(false)
 						}}
 					>
@@ -153,7 +164,7 @@ const GameScreen = (props) => {
 			>
 				<p>Total Solutions {allSolutions.length}</p>
 				<ol>
-					{allSolutions.reverse().map((this_solution, i) => {
+					{allSolutions.map((this_solution, i) => {
 						const valid_sunset =
 							this_solution.solution.toString() === answers.sunset.result
 
@@ -177,12 +188,30 @@ const GameScreen = (props) => {
 										: null
 								}
 							>
-								({i + 1}) {'=>'} {this_solution.attempt} ={' '}
+								({allSolutions.length - i}) {'=>'} {this_solution.attempt} ={' '}
 								{this_solution.solution}
 							</li>
 						)
 					})}
 				</ol>
+				{foundAnswers[0] && foundAnswers[1] ? (
+					<div className='text-center'>
+						<p>Congrats! You Found all target answers!</p>
+
+						<button
+							onClick={() => {
+								setAllSolutions([])
+								setCurrentAttempt([])
+								setCurrentSolution('0')
+								back()
+								search()
+							}}
+							className='bg-purple-500 rounded px-3 py-1 shadow-lg text-white font-bold'
+						>
+							Next Puzzle
+						</button>
+					</div>
+				) : null}
 			</div>
 
 			{allSolutions.length === 10 ? (
@@ -257,7 +286,8 @@ const TopBar = (props) => {
 
 	let my_answers = answers || { has_valid_ans: false }
 
-	const [showSolutions, setShowSolutions] = useState(false)
+	const [showLowestSolution, setShowLowestSolution] = useState(false)
+	const [showHighestSolution, setShowHighestSolution] = useState(false)
 
 	return (
 		<div className='w-full'>
@@ -274,20 +304,7 @@ const TopBar = (props) => {
 				</button>
 
 				<div className='flex flex-wrap justify-center gap-x-2'>
-					<p
-						onClick={() => {
-							if (totalSolutions < 2) {
-								alert('You need at least 2 tries...')
-							} else {
-								let confirm_response = window.confirm(
-									showSolutions ? 'Hide Solutions?' : 'Show Solutions?'
-								)
-								if (confirm_response) setShowSolutions(!showSolutions)
-							}
-						}}
-					>
-						ZERO RUSH
-					</p>
+					<p>ZERO RUSH</p>
 				</div>
 				<button
 					onClick={() => {
@@ -303,11 +320,22 @@ const TopBar = (props) => {
 					showingHint ? 'opacity-100' : 'opacity-50'
 				}`}
 			>
-				<span className='bg-green-800 py-1 px-3 text-white font-bold rounded-lg text-center'>
-					<p>
+				<span className='bg-green-800 py-1 px-3 text-white font-bold rounded-lg text-center cursor-pointer'>
+					<p
+						onClick={() => {
+							if (totalSolutions < 2) {
+								alert('You need at least 2 tries...')
+							} else {
+								let confirm_response = window.confirm(
+									showLowestSolution ? 'Hide Solution?' : 'Show Solution?'
+								)
+								if (confirm_response) setShowLowestSolution(!showLowestSolution)
+							}
+						}}
+					>
 						Lowest: {my_answers.has_valid_ans ? my_answers.sunset.result : '-'}
 					</p>
-					{showSolutions
+					{showLowestSolution
 						? my_answers.has_valid_ans
 							? my_answers.sunset.answer
 									.toString()
@@ -315,12 +343,24 @@ const TopBar = (props) => {
 							: '-'
 						: null}
 				</span>
-				<span className='bg-blue-800 py-1 px-3 text-white font-bold rounded-lg text-center'>
-					<p>
+				<span className='bg-blue-800 py-1 px-3 text-white font-bold rounded-lg text-center cursor-pointer'>
+					<p
+						onClick={() => {
+							if (totalSolutions < 2) {
+								alert('You need at least 2 tries...')
+							} else {
+								let confirm_response = window.confirm(
+									showHighestSolution ? 'Hide Solution?' : 'Show Solution?'
+								)
+								if (confirm_response)
+									setShowHighestSolution(!showHighestSolution)
+							}
+						}}
+					>
 						Highest:
 						{my_answers.has_valid_ans ? my_answers.sunrise.result : '-'}
 					</p>
-					{showSolutions
+					{showHighestSolution
 						? my_answers.has_valid_ans
 							? my_answers.sunrise.answer
 									.toString()
@@ -328,9 +368,6 @@ const TopBar = (props) => {
 							: '-'
 						: null}
 				</span>
-				{/* <p className='bg-blue-800 py-1 px-3 text-white font-bold rounded-lg'>
-					Sunrise {my_answers.has_valid_ans ? my_answers.Sunrise.result : '-'}
-				</p> */}
 			</div>
 		</div>
 	)
