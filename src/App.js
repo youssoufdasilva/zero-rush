@@ -9,7 +9,8 @@ const App = () => {
 	const [generatedPuzzle, setGeneratedPuzzle] = useState(null)
 	const [generatedAnswers, setGeneratedAnswers] = useState(null)
 	const [isRushing, setIsRushing] = useState(false)
-	const [rushCounter, setRushCounter] = useState(false)
+	// const [rushCounter, setRushCounter] = useState(false)
+	const [stopRush, setStopRush] = useState(false)
 
 	const startGame = () => {
 		setShowGame(true)
@@ -18,40 +19,42 @@ const App = () => {
 
 	const findGoodPuzzleWithZero = (limit = 100) => {
 		for (let i = 0; i < limit; ++i) {
-			if (i === limit - 1) {
-				setIsRushing(false)
-			} else {
-				setRushCounter(i)
+			if (stopRush) {
+				alert('breakkk')
+				break
 			}
+
 			console.log('Attempt #', i)
 
 			let my_puzzle_string = generatePuzzle()
 			let my_answer_obj = generateAnswers(my_puzzle_string.split(','))
 
 			if (my_answer_obj !== null && my_answer_obj.has_valid_ans) {
-				console.log('Checking ', my_answer_obj)
+				// console.log('Checking ', my_answer_obj)
 
 				let has_zero = my_answer_obj.sunset.result === '0'
 
 				if (my_answer_obj.is_good && has_zero) {
-					console.log('Good and has Zero Found it at ', i)
+					console.log('>  Good and has Zero Found at ', i)
 					setGeneratedPuzzle(my_puzzle_string)
 					setGeneratedAnswers(my_answer_obj)
 					setIsRushing(false)
 					break
-				} else if (has_zero) {
-					console.log('>>>>>>> Has Zero Found at ', i)
-					setGeneratedPuzzle(my_puzzle_string)
-					setGeneratedAnswers(my_answer_obj)
-					// break
-				} else if (my_answer_obj.is_good) {
-					console.log('Just Good Found at ', i)
-					setGeneratedPuzzle(my_puzzle_string)
-					setGeneratedAnswers(my_answer_obj)
+				} else {
+					console.log('Not Good Found at ', i)
+					// setGeneratedPuzzle(my_puzzle_string)
+					// setGeneratedAnswers(my_answer_obj)
 					// break
 				}
 			}
+
+			if (i === limit - 1) {
+				searchPuzzle()
+				setIsRushing(false)
+				break
+			}
 		}
+		setStopRush(false)
 	}
 
 	const searchPuzzle = () => {
@@ -79,7 +82,7 @@ const App = () => {
 					setIsRushing(true)
 					setTimeout(() => {
 						setGeneratedPuzzle(null)
-						findGoodPuzzleWithZero(100)
+						findGoodPuzzleWithZero(10)
 					}, 100)
 				}}
 				isRushing={isRushing}
@@ -95,7 +98,11 @@ const App = () => {
 						setGeneratedAnswers(null)
 					}}
 					isRushing={isRushing}
-					rushCounter={rushCounter}
+					// usedRush={usedRush}
+					stopRush={() => {
+						console.warn('Stopping Rush')
+						setStopRush(true)
+					}}
 				/>
 			</WelcomeScreen>
 
@@ -118,7 +125,7 @@ const App = () => {
 }
 
 const ConfirmPuzzle = (props) => {
-	const { puzzle, answers, isRushing, start, clear } = props
+	const { puzzle, answers, start, clear, isRushing, stopRush } = props
 
 	const [showingStats, setShowingStats] = useState(false)
 
@@ -140,7 +147,7 @@ const ConfirmPuzzle = (props) => {
 			custom_style = 'border-4 border-yellow-200 bg-green-500'
 			status = 'Meh!'
 		}
-	} else {
+	} else if (answers !== null && !answers.has_valid_ans) {
 		custom_style = 'border-4 border-red-500'
 		status = 'Nope!'
 	}
@@ -161,8 +168,8 @@ const ConfirmPuzzle = (props) => {
 				>
 					<p className='border-b border-black'>
 						{`#${answers ? answers.all_answers : '-'} | [↓ ${
-							answers ? answers.sunset.result : '-'
-						},↑ ${answers ? answers.sunrise.result : '-'}]`}
+							answers && answers.sunset ? answers.sunset.result : '-'
+						},↑ ${answers && answers.sunrise ? answers.sunrise.result : '-'}]`}
 					</p>
 
 					{showingStats ? (
@@ -173,8 +180,14 @@ const ConfirmPuzzle = (props) => {
 									answers ? answers.all_permutations : '-'
 								}`}
 							</p>
-							<p>Lowest: {`${answers ? answers.sunset.result : '-'}`}</p>
-							<p>Highest: {`${answers ? answers.sunrise.result : '-'}`}</p>
+							<p>
+								Lowest:{' '}
+								{`${answers && answers.sunset ? answers.sunset.result : '-'}`}
+							</p>
+							<p>
+								Highest:{' '}
+								{`${answers && answers.sunrise ? answers.sunrise.result : '-'}`}
+							</p>
 							<p>
 								Status: {status} (
 								{answers && answers.has_valid_ans && answers.all_answers
@@ -208,8 +221,23 @@ const ConfirmPuzzle = (props) => {
 			</div>
 
 			<div className={isRushing ? 'block text-center m-4' : 'hidden'}>
-				<p>Rushing!</p>
+				<p
+					onClick={() => {
+						alert('test')
+					}}
+				>
+					Rushing!
+				</p>
 				<p>Please Wait...</p>
+				<button
+					className='text-purple-800 bg-white rounded px-4 py-1 font-bold mt-6'
+					onClick={() => {
+						alert('stopping...')
+						stopRush()
+					}}
+				>
+					Stop Rush
+				</button>
 			</div>
 		</div>
 	)
@@ -230,7 +258,11 @@ const WelcomeScreen = (props) => {
 					onClick={() => {
 						search()
 					}}
-					className='mt-4 px-8 py-2 rounded bg-purple-800 text-white font-bold'
+					className={
+						!isRushing
+							? 'mt-4 px-8 py-2 rounded bg-purple-800 text-white font-bold'
+							: 'hidden'
+					}
 				>
 					Generate Puzzle
 				</button>
