@@ -61,6 +61,10 @@ const GameScreen = (props) => {
 						'Congratulations On Finding the HIGHEST Possible Valid Answer! '
 					)
 				}
+
+				if (foundAnswers[0] && foundAnswers[1]) {
+					setShowingHint(true)
+				}
 			}, 1000)
 		}
 		// }
