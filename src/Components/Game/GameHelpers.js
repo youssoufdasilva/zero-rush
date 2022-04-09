@@ -86,7 +86,17 @@ const generateAnswers = (puzzle) => {
 			// console.log(
 			// 	`Answer for ${solved_puzzle.puzzle} is: ${solved_puzzle.answer}`
 			// )
-			puzzle_answers[solved_puzzle.answer] = solved_puzzle.puzzle
+			// puzzle_answers[solved_puzzle.answer] = solved_puzzle.puzzle
+			let currentPermCount = 0
+
+			if (puzzle_answers[solved_puzzle.answer]) {
+				currentPermCount = puzzle_answers[solved_puzzle.answer].permutationCount
+			}
+
+			puzzle_answers[solved_puzzle.answer] = {
+				puzzle: solved_puzzle.puzzle,
+				permutationCount: currentPermCount + 1,
+			}
 		}
 	}
 
@@ -112,7 +122,9 @@ const generateAnswers = (puzzle) => {
 
 		sunset = {
 			result: all_answers[0],
-			answer: puzzle_answers[all_answers[0]],
+			// answer: puzzle_answers[all_answers[0]],
+			answer: puzzle_answers[all_answers[0]].puzzle,
+			permutationCount: puzzle_answers[all_answers[0]].permutationCount,
 		}
 
 		// console.log(
@@ -123,7 +135,9 @@ const generateAnswers = (puzzle) => {
 
 		sunrise = {
 			result: all_answers[last_ans],
-			answer: puzzle_answers[all_answers[last_ans]],
+			// answer: puzzle_answers[all_answers[last_ans]],
+			answer: puzzle_answers[all_answers[last_ans]].puzzle,
+			permutationCount: puzzle_answers[all_answers[last_ans]].permutationCount,
 		}
 	} else {
 		return {

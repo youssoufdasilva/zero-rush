@@ -164,11 +164,11 @@ const ConfirmPuzzle = (props) => {
 			status = 'Has Zero!'
 		} else {
 			custom_style = 'border-4 border-yellow-200 bg-green-500'
-			status = 'Meh!'
+			status = 'Not Garbage!'
 		}
 	} else if (answers !== null && !answers.has_valid_ans) {
 		custom_style = 'border-4 border-red-500'
-		status = 'Nope!'
+		status = 'Nope, Garbage!'
 	}
 	return (
 		<div
@@ -207,18 +207,22 @@ const ConfirmPuzzle = (props) => {
 							<p>
 								Lowest:{' '}
 								{`${answers && answers.sunset ? answers.sunset.result : '-'}`}
+								{` (# of perm: ${
+									answers && answers.sunset
+										? answers.sunset.permutationCount
+										: '-'
+								})`}
 							</p>
 							<p>
 								Highest:{' '}
 								{`${answers && answers.sunrise ? answers.sunrise.result : '-'}`}
+								{` (# of perm: ${
+									answers && answers.sunrise
+										? answers.sunrise.permutationCount
+										: '-'
+								})`}
 							</p>
-							<p>
-								Status: {status} (
-								{answers && answers.has_valid_ans && answers.all_answers
-									? answers.all_answers
-									: '-'}
-								)
-							</p>
+							<p>Status: {status}</p>
 						</div>
 					) : null}
 				</div>

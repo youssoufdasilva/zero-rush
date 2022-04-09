@@ -10,6 +10,7 @@ const GameScreen = (props) => {
 	const [currentSolution, setCurrentSolution] = useState({ answer: '0' })
 	const [allSolutions, setAllSolutions] = useState([])
 	const [showingHint, setShowingHint] = useState(false)
+	const [showingObjective, setShowingObjective] = useState(false)
 	const [foundAnswers, setFoundAnswers] = useState([false, false])
 
 	if (puzzle === null) {
@@ -106,17 +107,23 @@ const GameScreen = (props) => {
 					// alert('pause game')
 					setShowingHint(!showingHint)
 				}}
+				showingObjective={showingObjective}
+				toggleObjective={() => {
+					// alert('pause game')
+					setShowingObjective(!showingObjective)
+				}}
 				answers={answers}
 			/>
 
 			<div
-				className={
-					allSolutions.length === 0
-						? 'hidden'
-						: 'flex flex-col flex-wrap items-center gap-4 p-4 border border-black rounded mx-4 text-xs'
-				}
+				className='flex flex-col flex-wrap items-center gap-4 p-4 border border-black rounded mx-4 text-xs'
+				// className={
+				// 	allSolutions.length === 0
+				// 		? 'hidden'
+				// 		: 'flex flex-col flex-wrap items-center gap-4 p-4 border border-black rounded mx-4 text-xs'
+				// }
 			>
-				<p>Total Solutions {allSolutions.length}</p>
+				<p>Number of Solutions: {allSolutions.length}</p>
 				<ol>
 					{allSolutions.map((this_solution, i) => {
 						const valid_sunset =
@@ -251,54 +258,73 @@ const GameScreen = (props) => {
 					</button>
 				</div>
 			) : (
-				<div className='flex gap-2 mb-16 border-white'>
-					{/* Hand */}
-					{puzzle !== null
-						? puzzle.split(',').map((card, i) => {
-								let card_available = currentAttempt.indexOf(card) === -1
+				<div className='flex flex-col justify-center items-center mb-4 gap-2'>
+					<div className='flex gap-2 border-white'>
+						{/* Hand */}
+						{puzzle !== null
+							? puzzle.split(',').map((card, i) => {
+									let card_available = currentAttempt.indexOf(card) === -1
 
-								let sunset_hint =
-									showingHint && card === answers.sunset.answer[0]
-								let sunrise_hint =
-									showingHint && card === answers.sunrise.answer[0]
+									let sunset_hint =
+										showingHint && card === answers.sunset.answer[0]
+									let sunrise_hint =
+										showingHint && card === answers.sunrise.answer[0]
 
-								return (
-									<div
-										key={`${card}-${i}`}
-										onClick={() => {
-											if (card_available) {
-												moveToAttempt(card)
-											}
-										}}
-										className={`${
-											card_available ? 'bg-white' : 'bg-gray-400'
-										} p-2x w-12 h-12 flex flex-col justify-center items-center text-2xl rounded border-4 ${
-											sunrise_hint
-												? 'border-blue-400'
-												: sunset_hint
-												? 'border-green-400'
-												: 'border-white'
-										}`}
-									>
-										{card}
-									</div>
-								)
-						  })
-						: null}
-					<button
-						className={
-							currentAttempt.length > 0
-								? 'bg-purple-800 w-12 h-12 px-2c mb-4 rounded font-bold text-white'
-								: 'bg-gray-400  w-12 h-12 px-2c mb-4 rounded font-bold text-white hiddenx'
-						}
-						onClick={() => {
-							setCurrentAttempt([])
-							setCurrentSolution({ answer: '0' })
-							// window.location.reload(false)
-						}}
-					>
-						Clear
-					</button>
+									return (
+										<div
+											key={`${card}-${i}`}
+											onClick={() => {
+												if (card_available) {
+													moveToAttempt(card)
+												}
+											}}
+											className={`${
+												card_available ? 'bg-white' : 'bg-gray-400'
+											} p-2x w-12 h-12 flex flex-col justify-center items-center text-2xl rounded border-4 ${
+												sunrise_hint
+													? 'border-blue-400'
+													: sunset_hint
+													? 'border-green-400'
+													: 'border-white'
+											}`}
+										>
+											{card}
+										</div>
+									)
+							  })
+							: null}
+					</div>
+					<div>
+						<button
+							className={
+								currentAttempt.length > 0
+									? 'bg-red-800 w-16 h-12 px-2c m-4 rounded font-bold text-white'
+									: 'bg-gray-400  w-16 h-12 px-2c m-4 rounded font-bold text-white hiddenx'
+							}
+							onClick={() => {
+								setCurrentAttempt([])
+								setCurrentSolution({ answer: '0' })
+								// window.location.reload(false)
+							}}
+						>
+							AC
+						</button>
+						<button
+							className={
+								currentAttempt.length > 0
+									? 'bg-purple-800 w-16 h-12 px-2c m-4 rounded font-bold text-white'
+									: 'bg-gray-400  w-16 h-12 px-2c m-4 rounded font-bold text-white hiddenx'
+							}
+							onClick={() => {
+								moveToHand(currentAttempt[currentAttempt.length - 1])
+								// setCurrentAttempt([])
+								// setCurrentSolution({ answer: '0' })
+								// window.location.reload(false)
+							}}
+						>
+							DEL
+						</button>
+					</div>
 				</div>
 			)}
 		</div>
@@ -306,7 +332,15 @@ const GameScreen = (props) => {
 }
 
 const TopBar = (props) => {
-	const { back, toggleHint, showingHint, answers, totalSolutions } = props
+	const {
+		back,
+		toggleHint,
+		showingHint,
+		showingObjective,
+		toggleObjective,
+		answers,
+		totalSolutions,
+	} = props
 
 	let my_answers = answers || { has_valid_ans: false }
 
@@ -327,71 +361,99 @@ const TopBar = (props) => {
 					Back
 				</button>
 
-				<div className='flex flex-wrap justify-center gap-x-2'>
-					<p>ZERO RUSH</p>
+				<div className='flex flex-col justify-start items-center gap-x-2 w-full h-full'>
+					<p className='text-2xl'>ZERO RUSH</p>
+					<div className={showingObjective ? 'visible text-xs' : 'invisible'}>
+						<div
+							className={`w-full flex flex-row flex-wrap justify-center items-center p-1 gap-1 ${
+								showingHint ? 'opacity-100' : 'opacity-50'
+							}`}
+						>
+							<span className='bg-green-800 py-1 px-3 text-white font-bold rounded-lg text-center cursor-pointer'>
+								<p
+									onClick={() => {
+										if (totalSolutions < 2) {
+											alert('You need at least 2 tries...')
+										} else {
+											let confirm_response = window.confirm(
+												showLowestSolution ? 'Hide Solution?' : 'Show Solution?'
+											)
+											if (confirm_response)
+												setShowLowestSolution(!showLowestSolution)
+										}
+									}}
+								>
+									Lowest:{' '}
+									{my_answers.has_valid_ans ? my_answers.sunset.result : '-'}
+								</p>
+								{showLowestSolution
+									? my_answers.has_valid_ans
+										? my_answers.sunset.answer
+												.toString()
+												.substring(
+													1,
+													my_answers.sunset.answer.toString().length
+												)
+										: '-'
+									: null}
+							</span>
+							<span className='bg-blue-800 py-1 px-3 text-white font-bold rounded-lg text-center cursor-pointer'>
+								<p
+									onClick={() => {
+										if (totalSolutions < 2) {
+											alert('You need at least 2 tries...')
+										} else {
+											let confirm_response = window.confirm(
+												showHighestSolution
+													? 'Hide Solution?'
+													: 'Show Solution?'
+											)
+											if (confirm_response)
+												setShowHighestSolution(!showHighestSolution)
+										}
+									}}
+								>
+									Highest:
+									{my_answers.has_valid_ans ? my_answers.sunrise.result : '-'}
+								</p>
+								{showHighestSolution
+									? my_answers.has_valid_ans
+										? my_answers.sunrise.answer
+												.toString()
+												.substring(
+													1,
+													my_answers.sunrise.answer.toString().length
+												)
+										: '-'
+									: null}
+							</span>
+						</div>
+					</div>
 				</div>
-				<button
-					onClick={() => {
-						toggleHint()
-					}}
-					className='inline-block py-1 w-24 rounded bg-purple-500 text-white font-bold'
-				>
-					{showingHint ? 'Hide Hint' : 'Show Hint'}
-				</button>
-			</div>
-			<div
-				className={`w-full flex flex-row flex-wrap justify-center items-center p-1 gap-1 ${
-					showingHint ? 'opacity-100' : 'opacity-50'
-				}`}
-			>
-				<span className='bg-green-800 py-1 px-3 text-white font-bold rounded-lg text-center cursor-pointer'>
-					<p
+				<div>
+					<button
 						onClick={() => {
-							if (totalSolutions < 2) {
-								alert('You need at least 2 tries...')
-							} else {
-								let confirm_response = window.confirm(
-									showLowestSolution ? 'Hide Solution?' : 'Show Solution?'
-								)
-								if (confirm_response) setShowLowestSolution(!showLowestSolution)
-							}
+							toggleObjective()
 						}}
+						className={`inline-block py-1 w-24 m-1 rounded bg-purple-500 text-white font-bold ${
+							showingObjective ? 'opacity-100' : 'opacity-50'
+						}`}
 					>
-						Lowest: {my_answers.has_valid_ans ? my_answers.sunset.result : '-'}
-					</p>
-					{showLowestSolution
-						? my_answers.has_valid_ans
-							? my_answers.sunset.answer
-									.toString()
-									.substring(1, my_answers.sunset.answer.toString().length)
-							: '-'
-						: null}
-				</span>
-				<span className='bg-blue-800 py-1 px-3 text-white font-bold rounded-lg text-center cursor-pointer'>
-					<p
-						onClick={() => {
-							if (totalSolutions < 2) {
-								alert('You need at least 2 tries...')
-							} else {
-								let confirm_response = window.confirm(
-									showHighestSolution ? 'Hide Solution?' : 'Show Solution?'
-								)
-								if (confirm_response)
-									setShowHighestSolution(!showHighestSolution)
-							}
-						}}
-					>
-						Highest:
-						{my_answers.has_valid_ans ? my_answers.sunrise.result : '-'}
-					</p>
-					{showHighestSolution
-						? my_answers.has_valid_ans
-							? my_answers.sunrise.answer
-									.toString()
-									.substring(1, my_answers.sunrise.answer.toString().length)
-							: '-'
-						: null}
-				</span>
+						{showingObjective ? 'Hide Goal' : 'Show Goal'}
+					</button>
+					<div className={`${showingObjective ? 'visible' : 'invisible'}`}>
+						<button
+							onClick={() => {
+								toggleHint()
+							}}
+							className={`inline-block py-1 w-24 m-1 rounded bg-purple-500 text-white font-bold ${
+								showingHint ? 'opacity-100' : 'opacity-50'
+							}`}
+						>
+							{showingHint ? 'Hide Hint' : 'Show Hint'}
+						</button>
+					</div>
+				</div>
 			</div>
 		</div>
 	)
