@@ -61,12 +61,24 @@ const App = () => {
 		// setStopRush(false)
 	}
 
-	const searchPuzzle = () => {
+	const searchPuzzle = (experiement = false) => {
 		// console.log('Starting game...')
 		setIsRushing(false)
 		setRushFound(false)
 
-		let my_puzzle_string = generatePuzzle()
+		let my_puzzle_string
+
+		if (experiement) {
+			my_puzzle_string = generatePuzzle(
+				5,
+				{ min: 1, max: 9 }, //plusRange
+				{ min: 1, max: 9 }, //minusRange
+				{ min: 1, max: 9 }, //multRange
+				{ min: 1, max: 9 } //divRange
+			)
+		} else {
+			my_puzzle_string = generatePuzzle()
+		}
 		console.log('my_puzzle_string ', my_puzzle_string)
 		setGeneratedPuzzle(my_puzzle_string)
 
@@ -82,6 +94,9 @@ const App = () => {
 				visible={showWelcome}
 				search={() => {
 					searchPuzzle()
+				}}
+				experiemtalSearch={() => {
+					searchPuzzle(true)
 				}}
 				rush={() => {
 					setIsRushing(true)
@@ -246,7 +261,8 @@ const ConfirmPuzzle = (props) => {
 }
 
 const WelcomeScreen = (props) => {
-	const { visible, search, rush, isRushing, children } = props
+	const { visible, search, experiemtalSearch, rush, isRushing, children } =
+		props
 
 	return (
 		<div
@@ -256,6 +272,19 @@ const WelcomeScreen = (props) => {
 			<p className='text-3xl'>Welcome to</p>
 			<p className='text-4xl'>ZERO RUSH!</p>
 			<div>
+				<button
+					onClick={() => {
+						experiemtalSearch()
+					}}
+					className={
+						!isRushing
+							? 'm-4 px-4 py-2 rounded-full bg-purple-800 text-white font-bold'
+							: 'hidden'
+					}
+				>
+					?
+				</button>
+
 				<button
 					onClick={() => {
 						search()

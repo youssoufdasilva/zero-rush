@@ -7,7 +7,7 @@ const GameScreen = (props) => {
 	// const currentHand = visible && puzzle !== null ? puzzle.split(',') : []
 
 	const [currentAttempt, setCurrentAttempt] = useState([])
-	const [currentSolution, setCurrentSolution] = useState({ answer: '-' })
+	const [currentSolution, setCurrentSolution] = useState({ answer: '0' })
 	const [allSolutions, setAllSolutions] = useState([])
 	const [showingHint, setShowingHint] = useState(false)
 	const [foundAnswers, setFoundAnswers] = useState([false, false])
@@ -109,56 +109,6 @@ const GameScreen = (props) => {
 				answers={answers}
 			/>
 
-			<div className='flex flex-col'>
-				<div
-					style={
-						allSolutions.length === 10
-							? { display: 'none' }
-							: { display: 'flex' }
-					}
-					className={` gap-2 mb-4 border-white`}
-				>
-					{/* Attempt */}
-					{currentAttempt !== []
-						? currentAttempt.map((card, i) => {
-								return (
-									<div
-										key={`${card}-${i}`}
-										onClick={() => moveToHand(card)}
-										className='bg-white w-12 h-12 flex justify-center items-center rounded-full border-2'
-									>
-										{i !== 0 ? card : card.substring(1, card.length)}
-									</div>
-								)
-						  })
-						: null}
-				</div>
-
-				<div
-					style={
-						allSolutions.length === 10
-							? { display: 'none' }
-							: { display: 'flex' }
-					}
-					className=' flex-col flex-wrap items-center gap-2'
-				>
-					<p className='text-2xl'>Solution: {currentSolution.answer}</p>
-					<button
-						className={
-							currentAttempt.length > 0
-								? 'bg-purple-800 px-2 mb-4 rounded font-bold text-white'
-								: 'hidden'
-						}
-						onClick={() => {
-							setCurrentAttempt([])
-							setCurrentSolution({ answer: '0' })
-							// window.location.reload(false)
-						}}
-					>
-						Clear
-					</button>
-				</div>
-			</div>
 			<div
 				className={
 					allSolutions.length === 0
@@ -192,7 +142,8 @@ const GameScreen = (props) => {
 										: null
 								}
 							>
-								({allSolutions.length - i}) {'=>'} {this_solution.attempt} ={' '}
+								{/* ({allSolutions.length - i}) {'=>'} {this_solution.attempt} ={' '} */}
+								({i + 1}) {'=>'} {this_solution.attempt} ={' '}
 								{this_solution.solution}
 							</li>
 						)
@@ -216,6 +167,61 @@ const GameScreen = (props) => {
 						</button>
 					</div>
 				) : null}
+			</div>
+
+			<div className='flex flex-col'>
+				<div
+					style={
+						allSolutions.length === 10
+							? { display: 'none' }
+							: { display: 'flex' }
+					}
+					className={` gap-2 mb-4 border-white`}
+				>
+					{/* Attempt */}
+					{currentAttempt !== []
+						? currentAttempt.map((card, i) => {
+								return (
+									<div
+										key={`${card}-${i}`}
+										onClick={() => moveToHand(card)}
+										className='bg-white w-12 h-12 flex justify-center items-center rounded-full border-2'
+									>
+										{i !== 0 ? card : card.substring(1, card.length)}
+									</div>
+								)
+						  })
+						: null}
+				</div>
+
+				<div
+					style={
+						allSolutions.length === 10
+							? { display: 'none' }
+							: { display: 'flex' }
+					}
+					className=' flex-col flex-wrap items-center gap-2'
+				>
+					{/* <p className='text-2xl'>Solution: {currentSolution.answer}</p> */}
+					<p className='text-2xl'>
+						Solution:{' '}
+						{Math.round((currentSolution.answer + Number.EPSILON) * 100) / 100}
+					</p>
+					<button
+						className={
+							currentAttempt.length > 0
+								? 'hidden bg-purple-800 px-2 mb-4 rounded font-bold text-white'
+								: 'hidden'
+						}
+						onClick={() => {
+							setCurrentAttempt([])
+							setCurrentSolution({ answer: '0' })
+							// window.location.reload(false)
+						}}
+					>
+						Clear
+					</button>
+				</div>
 			</div>
 
 			{allSolutions.length === 10 ? (
@@ -245,7 +251,7 @@ const GameScreen = (props) => {
 					</button>
 				</div>
 			) : (
-				<div className='flex gap-1 mb-16 border-white'>
+				<div className='flex gap-2 mb-16 border-white'>
 					{/* Hand */}
 					{puzzle !== null
 						? puzzle.split(',').map((card, i) => {
@@ -266,7 +272,7 @@ const GameScreen = (props) => {
 										}}
 										className={`${
 											card_available ? 'bg-white' : 'bg-gray-400'
-										} p-2 rounded border-4 ${
+										} p-2x w-12 h-12 flex flex-col justify-center items-center text-2xl rounded border-4 ${
 											sunrise_hint
 												? 'border-blue-400'
 												: sunset_hint
@@ -279,6 +285,20 @@ const GameScreen = (props) => {
 								)
 						  })
 						: null}
+					<button
+						className={
+							currentAttempt.length > 0
+								? 'bg-purple-800 w-12 h-12 px-2c mb-4 rounded font-bold text-white'
+								: 'bg-gray-400  w-12 h-12 px-2c mb-4 rounded font-bold text-white hiddenx'
+						}
+						onClick={() => {
+							setCurrentAttempt([])
+							setCurrentSolution({ answer: '0' })
+							// window.location.reload(false)
+						}}
+					>
+						Clear
+					</button>
 				</div>
 			)}
 		</div>

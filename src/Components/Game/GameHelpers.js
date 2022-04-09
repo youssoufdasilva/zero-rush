@@ -209,14 +209,20 @@ function solvePuzzle(puzzle_to_solve) {
 }
 
 // Function to Generate the puzzle based on the length passed
-function generatePuzzle(puzzle_length = 6) {
+function generatePuzzle(
+	puzzle_length = 6,
+	plusRange = { min: 1, max: 18 },
+	minusRange = { min: 1, max: 18 },
+	multRange = { min: 2, max: 12 },
+	divRange = { min: 2, max: 12 }
+) {
 	// console.log('Generating Puzzle...')
 	var puzzle = []
 	// generate a list of all cards
-	var all_arithmetic_cards = initArithmeticCards('+')
-		.concat(initArithmeticCards('÷'))
-		.concat(initArithmeticCards('-'))
-		.concat(initArithmeticCards('*'))
+	var all_arithmetic_cards = initArithmeticCards('+', plusRange)
+		.concat(initArithmeticCards('÷', divRange))
+		.concat(initArithmeticCards('-', minusRange))
+		.concat(initArithmeticCards('*', multRange))
 
 	for (let i = 0; i < puzzle_length; i++) {
 		var randomIndex = Math.floor(Math.random() * all_arithmetic_cards.length)
@@ -233,13 +239,21 @@ function generatePuzzle(puzzle_length = 6) {
 }
 
 // Function to generate cards
-function initArithmeticCards(sign) {
-	if (sign === '+' || sign === '-') {
-		return makeCards(sign, 1, 18)
+function initArithmeticCards(sign, range) {
+	if (sign === '+') {
+		return makeCards(sign, range.min, range.max)
 	}
 
-	if (sign === '*' || sign === '÷') {
-		return makeCards(sign, 2, 12)
+	if (sign === '-') {
+		return makeCards(sign, range.min, range.max)
+	}
+
+	if (sign === '*') {
+		return makeCards(sign, range.min, range.max)
+	}
+
+	if (sign === '÷') {
+		return makeCards(sign, range.min, range.max)
 	}
 
 	return 'Please pass +, -, * or ÷ as the parameter'
