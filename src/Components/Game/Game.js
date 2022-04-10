@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { solvePuzzle } from './GameHelpers'
 
 const GameScreen = (props) => {
-	const { puzzle, answers, visible, back, search } = props
+	const { puzzle, answers, visible, back /* search */ } = props
 
 	// const currentHand = visible && puzzle !== null ? puzzle.split(',') : []
 
@@ -24,7 +24,19 @@ const GameScreen = (props) => {
 				currentAttempt.length + unusedAttempts.length !==
 				puzzle.split(',').length
 			) {
-				updateUnusedAttempts()
+				// updateUnusedAttempts()
+				console.log("puzzle.split(', ').length :: ", puzzle.split(',').length)
+				console.log('currentAttempt.length :: ', currentAttempt.length)
+
+				let temp_unused = [],
+					unused_size = puzzle.split(',').length - currentAttempt.length
+
+				console.log('unused_size :: ', unused_size)
+
+				for (let i = 0; i < unused_size; i++) {
+					temp_unused.push('')
+				}
+				setUnusedAttempts(temp_unused)
 			}
 		}
 	}, [unusedAttempts, currentAttempt, puzzle, visible])
