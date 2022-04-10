@@ -17,7 +17,7 @@ const App = () => {
 		setShowWelcome(false)
 	}
 
-	const findGoodPuzzleWithZero = (limit = 100) => {
+	/* 	const findGoodPuzzleWithZero = (limit = 100) => {
 		setGeneratedPuzzle(null)
 		setGeneratedAnswers(null)
 
@@ -59,7 +59,7 @@ const App = () => {
 			}
 		}
 		// setStopRush(false)
-	}
+	} */
 
 	const searchPuzzle = (experiement = false) => {
 		// console.log('Starting game...')
@@ -90,22 +90,24 @@ const App = () => {
 	return (
 		// Welcome Screen
 		<div className='w-full md:max-w-md mx-auto my-0'>
-			<WelcomeScreen
+			{/* WelcomeScreen */}
+			<SimpleWelcomeScreen
 				visible={showWelcome}
 				search={() => {
-					searchPuzzle()
-				}}
-				experiemtalSearch={() => {
+					// searchPuzzle()
 					searchPuzzle(true)
 				}}
-				rush={() => {
-					setIsRushing(true)
-					setTimeout(() => {
-						setGeneratedPuzzle(null)
-						findGoodPuzzleWithZero(10)
-					}, 100)
-				}}
-				isRushing={isRushing}
+				// experiemtalSearch={() => {
+				// 	searchPuzzle(true)
+				// }}
+				// rush={() => {
+				// 	setIsRushing(true)
+				// 	setTimeout(() => {
+				// 		setGeneratedPuzzle(null)
+				// 		findGoodPuzzleWithZero(10)
+				// 	}, 100)
+				// }}
+				// isRushing={isRushing}
 			>
 				<React.Fragment>
 					{/* {isRushing} */}
@@ -123,7 +125,7 @@ const App = () => {
 						rushFound={rushFound}
 					/>
 				</React.Fragment>
-			</WelcomeScreen>
+			</SimpleWelcomeScreen>
 
 			<GameScreen
 				puzzle={generatedPuzzle}
@@ -147,32 +149,34 @@ const ConfirmPuzzle = (props) => {
 	const { puzzle, answers, start, clear, isRushing, rushFound } = props
 
 	const [showingStats, setShowingStats] = useState(false)
+	const [showingGoal, setShowingGoal] = useState(false)
 
 	if (puzzle === null && isRushing === false) return null
 
 	let status, custom_style
 	if (answers !== null && answers.has_valid_ans) {
 		let has_zero = answers.sunset.result === '0'
-		if (answers.is_good && has_zero) {
+		let is_good = answers.sunrise.permutationCount === 1
+		if (is_good && has_zero) {
 			custom_style = 'border-4 border-green-500 bg-green-500'
 			status = "Let's Go!"
-		} else if (answers.is_good) {
-			custom_style = 'border-4 border-yellow-500'
+		} else if (is_good) {
+			custom_style = 'border-4 border-yellow-500 bg-green-500'
 			status = 'Decent!'
 		} else if (has_zero) {
-			custom_style = 'border-4 border-green-500'
+			custom_style = 'border-4 border-green-500 bg-purple-800'
 			status = 'Has Zero!'
 		} else {
-			custom_style = 'border-4 border-yellow-200 bg-green-500'
+			custom_style = 'border-4 border-yellow-200 bg-purple-800'
 			status = 'Not Garbage!'
 		}
 	} else if (answers !== null && !answers.has_valid_ans) {
-		custom_style = 'border-4 border-red-500'
+		custom_style = 'border-4 border-red-500 bg-red-800'
 		status = 'Nope, Garbage!'
 	}
 	return (
 		<div
-			className={`min-w-1/2 w-1/2x px-4 bg-purple-800 rounded-xl shadow-xl text-white mx-auto my-4 ${custom_style}`}
+			className={`min-w-1/2 w-1/2x px-4 rounded-xl shadow-xl text-white mx-auto my-4 ${custom_style}`}
 		>
 			<div
 				className={
@@ -181,13 +185,23 @@ const ConfirmPuzzle = (props) => {
 						: 'flex flex-col justify-center items-center p-4 '
 				}
 			>
-				{rushFound ? (
-					<p className='mb-2'>Easier Puzzle Found!</p>
-				) : (
-					<p className='mb-2'>Random Puzzle!</p>
-				)}
 				<div
-					className='text-center bg-purple-100 p-1 rounded text-black mb-4'
+					className='text-purple-800 bg-white rounded px-2 py-1x font-bold mt-6x mb-2'
+					onClick={() => setShowingGoal(!showingGoal)}
+				>
+					{rushFound ? (
+						<p className='m-1'>Easier Puzzle Found!</p>
+					) : (
+						<p className='m-1'>New Random Puzzle!</p>
+					)}
+				</div>
+
+				<div
+					className={
+						showingGoal
+							? 'text-center bg-purple-100 p-1 rounded text-black mb-4'
+							: 'hidden'
+					}
 					onClick={() => setShowingStats(!showingStats)}
 				>
 					<p className='border-b border-black'>
@@ -264,9 +278,64 @@ const ConfirmPuzzle = (props) => {
 	)
 }
 
-const WelcomeScreen = (props) => {
-	const { visible, search, experiemtalSearch, rush, isRushing, children } =
-		props
+// const WelcomeScreen = (props) => {
+// 	const { visible, search, experiemtalSearch, rush, isRushing, children } =
+// 		props
+
+// 	return (
+// 		<div
+// 			style={visible ? { display: 'flex' } : { display: 'none' }}
+// 			className='h-screen flex-col justify-center items-center font-bold bg-purple-200'
+// 		>
+// 			<p className='text-3xl'>Welcome to</p>
+// 			<p className='text-4xl'>ZERO RUSH!</p>
+// 			<div>
+// 				<button
+// 					onClick={() => {
+// 						experiemtalSearch()
+// 					}}
+// 					className={
+// 						!isRushing
+// 							? 'm-4 px-4 py-2 rounded-full bg-purple-800 text-white font-bold'
+// 							: 'hidden'
+// 					}
+// 				>
+// 					?
+// 				</button>
+
+// 				<button
+// 					onClick={() => {
+// 						search()
+// 					}}
+// 					className={
+// 						!isRushing
+// 							? 'mt-4 px-8 py-2 rounded bg-purple-800 text-white font-bold'
+// 							: 'hidden'
+// 					}
+// 				>
+// 					Random Puzzle
+// 				</button>
+
+// 				<button
+// 					onClick={() => {
+// 						rush()
+// 					}}
+// 					className={
+// 						!isRushing
+// 							? `mt-4 ml-4 px-2 py-2 rounded-full bg-purple-800 text-white font-bold`
+// 							: 'hidden'
+// 					}
+// 				>
+// 					Rush
+// 				</button>
+// 			</div>
+// 			{children}
+// 		</div>
+// 	)
+// }
+
+const SimpleWelcomeScreen = (props) => {
+	const { visible, search, children } = props
 
 	return (
 		<div
@@ -278,41 +347,13 @@ const WelcomeScreen = (props) => {
 			<div>
 				<button
 					onClick={() => {
-						experiemtalSearch()
-					}}
-					className={
-						!isRushing
-							? 'm-4 px-4 py-2 rounded-full bg-purple-800 text-white font-bold'
-							: 'hidden'
-					}
-				>
-					?
-				</button>
-
-				<button
-					onClick={() => {
 						search()
 					}}
 					className={
-						!isRushing
-							? 'mt-4 px-8 py-2 rounded bg-purple-800 text-white font-bold'
-							: 'hidden'
+						'mt-4 px-8 py-2 rounded bg-purple-800 text-white font-bold'
 					}
 				>
-					Random Puzzle
-				</button>
-
-				<button
-					onClick={() => {
-						rush()
-					}}
-					className={
-						!isRushing
-							? `mt-4 ml-4 px-2 py-2 rounded-full bg-purple-800 text-white font-bold`
-							: 'hidden'
-					}
-				>
-					Rush
+					Search Puzzle
 				</button>
 			</div>
 			{children}

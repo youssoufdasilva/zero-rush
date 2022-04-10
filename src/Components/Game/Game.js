@@ -7,11 +7,27 @@ const GameScreen = (props) => {
 	// const currentHand = visible && puzzle !== null ? puzzle.split(',') : []
 
 	const [currentAttempt, setCurrentAttempt] = useState([])
+	const [unusedAttempts, setUnusedAttempts] = useState([])
 	const [currentSolution, setCurrentSolution] = useState({ answer: '0' })
 	const [allSolutions, setAllSolutions] = useState([])
 	const [showingHint, setShowingHint] = useState(false)
 	const [showingObjective, setShowingObjective] = useState(false)
 	const [foundAnswers, setFoundAnswers] = useState([false, false])
+
+	React.useEffect(() => {
+		if (puzzle && visible) {
+			console.log(
+				'currentAttempt.length + unusedAttempts.length :: ',
+				currentAttempt.length + unusedAttempts.length
+			)
+			if (
+				currentAttempt.length + unusedAttempts.length !==
+				puzzle.split(',').length
+			) {
+				updateUnusedAttempts()
+			}
+		}
+	}, [unusedAttempts, currentAttempt, puzzle, visible])
 
 	if (puzzle === null) {
 		back()
@@ -20,6 +36,21 @@ const GameScreen = (props) => {
 		if (visible) window.location.reload(false)
 
 		return null
+	}
+
+	const updateUnusedAttempts = () => {
+		console.log("puzzle.split(', ').length :: ", puzzle.split(',').length)
+		console.log('currentAttempt.length :: ', currentAttempt.length)
+
+		let temp_unused = [],
+			unused_size = puzzle.split(',').length - currentAttempt.length
+
+		console.log('unused_size :: ', unused_size)
+
+		for (let i = 0; i < unused_size; i++) {
+			temp_unused.push('')
+		}
+		setUnusedAttempts(temp_unused)
 	}
 
 	const moveToAttempt = (card) => {
@@ -32,7 +63,7 @@ const GameScreen = (props) => {
 		// if (temp_attempt.length > 1) {
 		let temp_solution = solvePuzzle(temp_attempt)
 		setCurrentSolution(temp_solution)
-		console.log('SOLUTION = ', temp_solution)
+		// console.log('SOLUTION = ', temp_solution)
 
 		if (temp_attempt.length === puzzle.split(',').length) {
 			// wait 1 second
@@ -51,16 +82,16 @@ const GameScreen = (props) => {
 					let temp_found_answers = foundAnswers
 					temp_found_answers[0] = true
 					setFoundAnswers(temp_found_answers)
-					alert('Congratulations On Finding the LOWEST Possible Valid Answer! ')
+					// alert('Congratulations On Finding the LOWEST Possible Valid Answer! ')
 				}
 
 				if (temp_solution.answer.toString() === answers.sunrise.result) {
 					let temp_found_answers = foundAnswers
 					temp_found_answers[1] = true
 					setFoundAnswers(temp_found_answers)
-					alert(
-						'Congratulations On Finding the HIGHEST Possible Valid Answer! '
-					)
+					// alert(
+					// 	'Congratulations On Finding the HIGHEST Possible Valid Answer! '
+					// )
 				}
 
 				if (foundAnswers[0] && foundAnswers[1]) {
@@ -68,6 +99,8 @@ const GameScreen = (props) => {
 				}
 			}, 1000)
 		}
+
+		updateUnusedAttempts()
 		// }
 	}
 
@@ -88,6 +121,8 @@ const GameScreen = (props) => {
 		let temp_solution = solvePuzzle(temp_attempt)
 		setCurrentSolution(temp_solution)
 		console.log('SOLUTION = ', temp_solution)
+
+		updateUnusedAttempts()
 	}
 
 	return (
@@ -136,22 +171,40 @@ const GameScreen = (props) => {
 							this_solution.solution.toString().charAt(0) === '-' ||
 							this_solution.solution.toString().split('.').length > 1
 
+						let style
+
+						if (valid_sunset) {
+							style = 'text-white bg-blue-500'
+						} else if (valid_sunrise) {
+							style = 'text-white bg-green-500'
+						} else if (invalid) {
+							style = 'text-white bg-red-500'
+						} else {
+							style = 'text-white bg-black'
+						}
+
 						return (
-							<li
-								key={i}
-								className={
-									valid_sunset
-										? 'text-green-500'
-										: valid_sunrise
-										? 'text-blue-500'
-										: invalid
-										? 'text-red-500'
-										: null
-								}
-							>
+							<li key={i} className={`flex gap-1 my-1 items-center`}>
 								{/* ({allSolutions.length - i}) {'=>'} {this_solution.attempt} ={' '} */}
-								({i + 1}) {'=>'} {this_solution.attempt} ={' '}
-								{this_solution.solution}
+								{/* ({i + 1}) {'=>'} {this_solution.attempt} ={' '}
+								{this_solution.solution} */}
+								{this_solution.attempt.split(',').map((card, i) => {
+									// bg-gray-100 border-gray-100 opacity-75 w-12 h-12 flex justify-center items-center rounded-full border-2
+									return (
+										<div
+											key={`${card}-${i}`}
+											// onClick={() => moveToHand(card)}
+											className={`w-8 h-8 flex justify-center items-center rounded-full ${style}`}
+										>
+											{/* {i !== 0 ? card : card.substring(1, card.length)} */}
+											{card}
+										</div>
+									)
+								})}
+
+								<p className={`p-2 rounded-xl ${style}`}>
+									= {this_solution.solution}
+								</p>
 							</li>
 						)
 					})}
@@ -162,11 +215,12 @@ const GameScreen = (props) => {
 
 						<button
 							onClick={() => {
-								setAllSolutions([])
-								setCurrentAttempt([])
-								setCurrentSolution('0')
-								back()
-								search()
+								// setAllSolutions([])
+								// setCurrentAttempt([])
+								// setCurrentSolution('0')
+								// back()
+								// search()
+								window.location.reload(false)
 							}}
 							className='bg-purple-500 rounded px-3 py-1 shadow-lg text-white font-bold'
 						>
@@ -183,7 +237,7 @@ const GameScreen = (props) => {
 							? { display: 'none' }
 							: { display: 'flex' }
 					}
-					className={` gap-2 mb-4 border-white`}
+					className={` gap-2 mb-4`}
 				>
 					{/* Attempt */}
 					{currentAttempt !== []
@@ -192,9 +246,24 @@ const GameScreen = (props) => {
 									<div
 										key={`${card}-${i}`}
 										onClick={() => moveToHand(card)}
-										className='bg-white w-12 h-12 flex justify-center items-center rounded-full border-2'
+										className='bg-white border-white w-12 h-12 flex justify-center items-center rounded-full border-2'
 									>
 										{i !== 0 ? card : card.substring(1, card.length)}
+									</div>
+								)
+						  })
+						: null}
+
+					{/* Unused Attempt */}
+					{unusedAttempts !== []
+						? unusedAttempts.map((emptyCard, i) => {
+								return (
+									<div
+										key={`${emptyCard}-${i}`}
+										// onClick={() => moveToHand(card)}
+										className='bg-gray-100 border-gray-100 opacity-75 w-12 h-12 flex justify-center items-center rounded-full border-2'
+									>
+										{emptyCard}
 									</div>
 								)
 						  })
@@ -210,8 +279,12 @@ const GameScreen = (props) => {
 					className=' flex-col flex-wrap items-center gap-2'
 				>
 					{/* <p className='text-2xl'>Solution: {currentSolution.answer}</p> */}
-					<p className='text-2xl'>
-						Solution:{' '}
+					<p
+						className={`${
+							currentAttempt.length === 0 ? 'opacity-0' : 'opacity-100'
+						} text-2xl bg-black text-white rounded-xl px-2 py-1`}
+					>
+						={' '}
 						{Math.round((currentSolution.answer + Number.EPSILON) * 100) / 100}
 					</p>
 					<button
@@ -282,9 +355,9 @@ const GameScreen = (props) => {
 												card_available ? 'bg-white' : 'bg-gray-400'
 											} p-2x w-12 h-12 flex flex-col justify-center items-center text-2xl rounded border-4 ${
 												sunrise_hint
-													? 'border-blue-400'
-													: sunset_hint
 													? 'border-green-400'
+													: sunset_hint
+													? 'border-blue-400'
 													: 'border-white'
 											}`}
 										>
@@ -353,8 +426,9 @@ const TopBar = (props) => {
 				{/* Navbar */}
 				<button
 					onClick={() => {
-						let confirm_response = window.confirm('Going Back?')
-						if (confirm_response) back()
+						// let confirm_response = window.confirm('Going Back?')
+						// if (confirm_response) back()
+						back()
 					}}
 					className='inline-block w-24 py-1 rounded bg-purple-500 text-white font-bold'
 				>
@@ -430,29 +504,29 @@ const TopBar = (props) => {
 						</div>
 					</div>
 				</div>
-				<div>
+				<div className='w-24 flex flex-col'>
 					<button
 						onClick={() => {
 							toggleObjective()
 						}}
-						className={`inline-block py-1 w-24 m-1 rounded bg-purple-500 text-white font-bold ${
+						className={`inline-block py-1 w-full m-1 rounded bg-purple-500 text-white font-bold ${
 							showingObjective ? 'opacity-100' : 'opacity-50'
 						}`}
 					>
-						{showingObjective ? 'Hide Goal' : 'Show Goal'}
+						{/* {showingObjective ? 'Hide Goal' : 'Show Goal'} */}
+						Goal
 					</button>
-					<div className={`${showingObjective ? 'visible' : 'invisible'}`}>
-						<button
-							onClick={() => {
-								toggleHint()
-							}}
-							className={`inline-block py-1 w-24 m-1 rounded bg-purple-500 text-white font-bold ${
-								showingHint ? 'opacity-100' : 'opacity-50'
-							}`}
-						>
-							{showingHint ? 'Hide Hint' : 'Show Hint'}
-						</button>
-					</div>
+					<button
+						onClick={() => {
+							toggleHint()
+						}}
+						className={`inline-block py-1 w-full m-1 rounded bg-purple-500 text-white font-bold ${
+							showingHint ? 'opacity-100' : 'opacity-50'
+						}`}
+					>
+						{/* {showingHint ? 'Hide Hint' : 'Show Hint'} */}
+						Hint
+					</button>
 				</div>
 			</div>
 		</div>
