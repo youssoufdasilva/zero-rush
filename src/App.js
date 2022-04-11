@@ -11,6 +11,7 @@ const App = () => {
 	const [isRushing, setIsRushing] = useState(false)
 	// const [rushCounter, setRushCounter] = useState(false)
 	const [rushFound, setRushFound] = useState(false)
+	const [searchHistory, setSearchHistory] = useState([])
 
 	const startGame = () => {
 		setShowGame(true)
@@ -85,6 +86,17 @@ const App = () => {
 		let my_answer_obj = generateAnswers(my_puzzle_string.split(','))
 		console.log('my_answer_obj ', my_answer_obj)
 		setGeneratedAnswers(my_answer_obj)
+
+		let temp_history = searchHistory
+		if (temp_history.length > 3) {
+			temp_history.splice(0, 1)
+		}
+		temp_history.push({
+			puzzle: generatedPuzzle,
+			answers: generatedAnswers,
+		})
+
+		setSearchHistory(temp_history)
 	}
 
 	return (
@@ -97,6 +109,19 @@ const App = () => {
 					// searchPuzzle()
 					searchPuzzle(true)
 				}}
+				prevSearch={() => {
+					let temp_history = searchHistory
+					if (temp_history.length > 1) {
+						const prevPuzzle = temp_history.pop()
+						setGeneratedPuzzle(prevPuzzle.puzzle)
+						setGeneratedAnswers(prevPuzzle.answers)
+						setSearchHistory(temp_history)
+					} else {
+						searchPuzzle(true)
+					}
+					// temp_history.splice(temp_history.length - 1, 1)
+				}}
+				historyLength={searchHistory.length}
 				// experiemtalSearch={() => {
 				// 	searchPuzzle(true)
 				// }}
@@ -335,7 +360,19 @@ const ConfirmPuzzle = (props) => {
 // }
 
 const SimpleWelcomeScreen = (props) => {
-	const { visible, search, children } = props
+	const { visible, search, prevSearch, historyLength, children } = props
+
+	const [searchText, setSearchText] = useState('')
+
+	React.useEffect(() => {
+		if (historyLength > 0) {
+			let temp_search_text = ''
+			for (let i = 0; i < historyLength - 1; i++) {
+				temp_search_text += '<'
+			}
+			setSearchText(temp_search_text)
+		}
+	}, [historyLength])
 
 	return (
 		<div
@@ -354,6 +391,19 @@ const SimpleWelcomeScreen = (props) => {
 					}
 				>
 					Search Puzzle
+				</button>
+
+				<button
+					onClick={() => {
+						prevSearch()
+					}}
+					className={
+						historyLength <= 1
+							? 'hidden'
+							: 'ml-2 px-4 py-2 rounded-full bg-purple-800 text-white text-xs font-bold'
+					}
+				>
+					{searchText}
 				</button>
 			</div>
 			{children}
