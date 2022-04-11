@@ -99,6 +99,17 @@ const App = () => {
 		setSearchHistory(temp_history)
 	}
 
+	React.useEffect(() => {
+		if (
+			showWelcome &&
+			searchHistory.length === 0 &&
+			generatedPuzzle === null &&
+			generatedAnswers === null
+		) {
+			searchPuzzle(true)
+		}
+	})
+
 	return (
 		// Welcome Screen
 		<div className='w-full md:max-w-md mx-auto my-0'>

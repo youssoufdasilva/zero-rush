@@ -5,14 +5,48 @@ const GameScreen = (props) => {
 	const { puzzle, answers, visible, back /* search */ } = props
 
 	// const currentHand = visible && puzzle !== null ? puzzle.split(',') : []
+	const max_solution = 6
 
 	const [currentAttempt, setCurrentAttempt] = useState([])
 	const [unusedAttempts, setUnusedAttempts] = useState([])
 	const [currentSolution, setCurrentSolution] = useState({ answer: '0' })
+	const [unusedSolutions, setUnusedSolutions] = useState([])
 	const [allSolutions, setAllSolutions] = useState([])
 	const [showingHint, setShowingHint] = useState(false)
 	const [showingObjective, setShowingObjective] = useState(false)
 	const [foundAnswers, setFoundAnswers] = useState([false, false])
+
+	const updateUnusedAttempts = React.useCallback(() => {
+		if (puzzle === null) return
+		console.log("puzzle.split(', ').length :: ", puzzle.split(',').length)
+		console.log('currentAttempt.length :: ', currentAttempt.length)
+
+		let temp_unused_attempt = [],
+			temp_unused_solutions = [], //2D array
+			unused_attempt_size = puzzle.split(',').length - currentAttempt.length,
+			unused_solution_size = max_solution - allSolutions.length
+
+		// console.log('unused_size :: ', unused_attempt_size)
+
+		for (let i = 0; i < unused_attempt_size; i++) {
+			temp_unused_attempt.push('')
+		}
+		setUnusedAttempts(temp_unused_attempt)
+
+		for (let j = 0; j < unused_solution_size - 1; j++) {
+			let blank_attempts = []
+			for (let k = 0; k < puzzle.split(',').length; k++) {
+				blank_attempts.push('')
+			}
+			temp_unused_solutions.push(blank_attempts)
+		}
+		setUnusedSolutions(temp_unused_solutions)
+	}, [puzzle, currentAttempt, max_solution, allSolutions])
+
+	// const updateUnusedAttemptsMemo = React.useMemo(
+	// 	() => updateUnusedAttempts(),
+	// 	[]
+	// )
 
 	React.useEffect(() => {
 		if (puzzle && visible) {
@@ -24,45 +58,19 @@ const GameScreen = (props) => {
 				currentAttempt.length + unusedAttempts.length !==
 				puzzle.split(',').length
 			) {
-				// updateUnusedAttempts()
+				updateUnusedAttempts()
 				console.log("puzzle.split(', ').length :: ", puzzle.split(',').length)
 				console.log('currentAttempt.length :: ', currentAttempt.length)
-
-				let temp_unused = [],
-					unused_size = puzzle.split(',').length - currentAttempt.length
-
-				console.log('unused_size :: ', unused_size)
-
-				for (let i = 0; i < unused_size; i++) {
-					temp_unused.push('')
-				}
-				setUnusedAttempts(temp_unused)
 			}
 		}
-	}, [unusedAttempts, currentAttempt, puzzle, visible])
+	}, [unusedAttempts, currentAttempt, puzzle, visible, updateUnusedAttempts])
 
 	if (puzzle === null) {
 		back()
+		// setCurrentSolution({ answer: '0' })
 
-		// if (!visible && currentAttempt !== []) setCurrentAttempt([])
 		if (visible) window.location.reload(false)
-
 		return null
-	}
-
-	const updateUnusedAttempts = () => {
-		console.log("puzzle.split(', ').length :: ", puzzle.split(',').length)
-		console.log('currentAttempt.length :: ', currentAttempt.length)
-
-		let temp_unused = [],
-			unused_size = puzzle.split(',').length - currentAttempt.length
-
-		console.log('unused_size :: ', unused_size)
-
-		for (let i = 0; i < unused_size; i++) {
-			temp_unused.push('')
-		}
-		setUnusedAttempts(temp_unused)
 	}
 
 	const moveToAttempt = (card) => {
@@ -144,11 +152,11 @@ const GameScreen = (props) => {
 		>
 			<TopBar
 				totalSolutions={allSolutions.length}
-				back={() => {
-					setAllSolutions([])
-					setCurrentAttempt([])
-					back()
-				}}
+				// back={() => {
+				// 	setAllSolutions([])
+				// 	setCurrentAttempt([])
+				// 	back()
+				// }}
 				showingHint={showingHint}
 				toggleHint={() => {
 					// alert('pause game')
@@ -162,16 +170,30 @@ const GameScreen = (props) => {
 				answers={answers}
 			/>
 
-			<div
-				className='flex flex-col flex-wrap items-center gap-4 p-4 border border-black rounded mx-4 text-xs'
-				// className={
-				// 	allSolutions.length === 0
-				// 		? 'hidden'
-				// 		: 'flex flex-col flex-wrap items-center gap-4 p-4 border border-black rounded mx-4 text-xs'
-				// }
-			>
-				<p>Number of Solutions: {allSolutions.length}</p>
-				<ol>
+			<div className='flex flex-col w-full px-4'>
+				<div className='flex flex-col flex-wrap items-center gap-2 p-2 mx-4 text-xs'>
+					{foundAnswers[1] ? (
+						<div className='text-center'>
+							<p>Congrats! You Found all target answers!</p>
+
+							<button
+								onClick={() => {
+									// setAllSolutions([])
+									// setCurrentAttempt([])
+									// setCurrentSolution('0')
+									// back()
+									// search()
+									window.location.reload(false)
+								}}
+								className='bg-purple-500 rounded px-3 py-1 shadow-lg text-white font-bold'
+							>
+								Reload Page
+							</button>
+						</div>
+					) : null}
+				</div>
+				{/* Past Solution */}
+				<div className='flex flex-col items-center justify-center'>
 					{allSolutions.map((this_solution, i) => {
 						const valid_sunset =
 							this_solution.solution.toString() === answers.sunset.result
@@ -186,133 +208,197 @@ const GameScreen = (props) => {
 						let style
 
 						if (valid_sunset) {
-							style = 'text-white bg-blue-500'
+							style = 'text-white bg-blue-500 border-blue-500'
 						} else if (valid_sunrise) {
-							style = 'text-white bg-green-500'
+							style = 'text-white bg-green-500 border-green-500'
 						} else if (invalid) {
-							style = 'text-white bg-red-500'
+							style = 'text-white bg-red-500 border-red-500'
 						} else {
-							style = 'text-white bg-black'
+							style = 'text-white bg-black border-black'
 						}
 
 						return (
-							<li key={i} className={`flex gap-1 my-1 items-center`}>
+							<li key={i} className={`flex gap-2 my-1 items-center`}>
 								{/* ({allSolutions.length - i}) {'=>'} {this_solution.attempt} ={' '} */}
 								{/* ({i + 1}) {'=>'} {this_solution.attempt} ={' '}
-								{this_solution.solution} */}
+							{this_solution.solution} */}
 								{this_solution.attempt.split(',').map((card, i) => {
 									// bg-gray-100 border-gray-100 opacity-75 w-12 h-12 flex justify-center items-center rounded-full border-2
+									// return (
+									// 	<div
+									// 		key={`${card}-${i}`}
+									// 		// onClick={() => moveToHand(card)}
+									// 		className={`w-8 h-8 flex justify-center items-center rounded-full ${style}`}
+									// 	>
+									// 		{/* {i !== 0 ? card : card.substring(1, card.length)} */}
+									// 		{card}
+									// 	</div>
+									// )
 									return (
 										<div
 											key={`${card}-${i}`}
 											// onClick={() => moveToHand(card)}
-											className={`w-8 h-8 flex justify-center items-center rounded-full ${style}`}
+											className={`border-gray-100x opacity-75x w-10 h-10 flex justify-center items-center rounded-full border-2  ${style}`}
 										>
-											{/* {i !== 0 ? card : card.substring(1, card.length)} */}
 											{card}
 										</div>
 									)
 								})}
 
-								<p className={`p-2 rounded-xl ${style}`}>
-									= {this_solution.solution}
-								</p>
+								{/* <p className={`p-2 rounded-xl ${style}`}>
+								= {this_solution.solution}
+							</p> */}
+								{/* Solution */}
+								<div
+									style={
+										allSolutions.length === 10
+											? { display: 'none' }
+											: { display: 'flex' }
+									}
+									className=' flex-col flex-wrap items-center gap-2'
+								>
+									{/* <p className='text-2xl'>Solution: {currentSolution.answer}</p> */}
+									<p
+										className={`opacity-100 text-xl bg-whitex text-blackx border-4 border-blackx rounded-xl p-1 w-24  ${style}`}
+									>
+										= {this_solution.solution}
+									</p>
+								</div>
 							</li>
 						)
+
+						// return (
+						// 	<div
+						// 		key={i}
+						// 		className='flex gap-2 bg-green-200x m-1 items-center justify-center'
+						// 	>
+						// 		{solution.map((emptyCard, i) => {
+						// 			return (
+						// 				<div
+						// 					key={`${emptyCard}-${i}`}
+						// 					// onClick={() => moveToHand(card)}
+						// 					className='bg-gray-100 border-gray-100 opacity-75 w-10 h-10 flex justify-center items-center rounded-full border-2'
+						// 				>
+						// 					{emptyCard}
+						// 				</div>
+						// 			)
+						// 		})}
+						// 		{/* Solution */}
+						// 		<div
+						// 			style={
+						// 				allSolutions.length === 10
+						// 					? { display: 'none' }
+						// 					: { display: 'flex' }
+						// 			}
+						// 			className=' flex-col flex-wrap items-center gap-2'
+						// 		>
+						// 			{/* <p className='text-2xl'>Solution: {currentSolution.answer}</p> */}
+						// 			<p
+						// 				className={`opacity-10 text-xl bg-white text-black border-4 border-black rounded-xl p-1 w-24`}
+						// 			>
+						// 				={' '}
+						// 			</p>
+						// 		</div>
+						// 	</div>
+						// )
 					})}
-				</ol>
-				{foundAnswers[0] && foundAnswers[1] ? (
-					<div className='text-center'>
-						<p>Congrats! You Found all target answers!</p>
-
-						<button
-							onClick={() => {
-								// setAllSolutions([])
-								// setCurrentAttempt([])
-								// setCurrentSolution('0')
-								// back()
-								// search()
-								window.location.reload(false)
-							}}
-							className='bg-purple-500 rounded px-3 py-1 shadow-lg text-white font-bold'
-						>
-							Next Puzzle
-						</button>
-					</div>
-				) : null}
-			</div>
-
-			<div className='flex flex-col'>
-				<div
-					style={
-						allSolutions.length === 10
-							? { display: 'none' }
-							: { display: 'flex' }
-					}
-					className={` gap-2 mb-4`}
-				>
-					{/* Attempt */}
-					{currentAttempt !== []
-						? currentAttempt.map((card, i) => {
-								return (
-									<div
-										key={`${card}-${i}`}
-										onClick={() => moveToHand(card)}
-										className='bg-white border-white w-12 h-12 flex justify-center items-center rounded-full border-2'
-									>
-										{i !== 0 ? card : card.substring(1, card.length)}
-									</div>
-								)
-						  })
-						: null}
-
-					{/* Unused Attempt */}
-					{unusedAttempts !== []
-						? unusedAttempts.map((emptyCard, i) => {
-								return (
-									<div
-										key={`${emptyCard}-${i}`}
-										// onClick={() => moveToHand(card)}
-										className='bg-gray-100 border-gray-100 opacity-75 w-12 h-12 flex justify-center items-center rounded-full border-2'
-									>
-										{emptyCard}
-									</div>
-								)
-						  })
-						: null}
 				</div>
 
+				{/* Current Attempt */}
 				<div
-					style={
-						allSolutions.length === 10
-							? { display: 'none' }
-							: { display: 'flex' }
-					}
-					className=' flex-col flex-wrap items-center gap-2'
+					className={`${
+						allSolutions.length === max_solution ? 'none' : 'flex'
+					} gap-2 my-2x w-full justify-center items-center`}
 				>
-					{/* <p className='text-2xl'>Solution: {currentSolution.answer}</p> */}
-					<p
-						className={`${
-							currentAttempt.length === 0 ? 'opacity-0' : 'opacity-100'
-						} text-2xl bg-black text-white rounded-xl px-2 py-1`}
-					>
-						={' '}
-						{Math.round((currentSolution.answer + Number.EPSILON) * 100) / 100}
-					</p>
-					<button
-						className={
-							currentAttempt.length > 0
-								? 'hidden bg-purple-800 px-2 mb-4 rounded font-bold text-white'
-								: 'hidden'
+					<div className='flex gap-2 my-2 '>
+						{/* Attempt */}
+						{currentAttempt !== []
+							? currentAttempt.map((card, i) => {
+									return (
+										<div
+											key={`${card}-${i}`}
+											onClick={() => moveToHand(card)}
+											className='bg-white border-white w-10 h-10 flex justify-center items-center rounded-full border-2'
+										>
+											{i !== 0 ? card : card.substring(1, card.length)}
+										</div>
+									)
+							  })
+							: null}
+
+						{/* Unused Attempt */}
+						{unusedAttempts !== []
+							? unusedAttempts.map((emptyCard, i) => {
+									return (
+										<div
+											key={`${emptyCard}-${i}`}
+											// onClick={() => moveToHand(card)}
+											className='bg-gray-100 border-gray-100 opacity-75 w-10 h-10 flex justify-center items-center rounded-full border-2'
+										>
+											{emptyCard}
+										</div>
+									)
+							  })
+							: null}
+					</div>
+					{/* Solution */}
+					<div
+						style={
+							allSolutions.length === 10
+								? { display: 'none' }
+								: { display: 'flex' }
 						}
-						onClick={() => {
-							setCurrentAttempt([])
-							setCurrentSolution({ answer: '0' })
-							// window.location.reload(false)
-						}}
+						className=' flex-col flex-wrap items-center gap-2'
 					>
-						Clear
-					</button>
+						{/* <p className='text-2xl'>Solution: {currentSolution.answer}</p> */}
+						<p
+							className={`${
+								currentAttempt.length === 0 ? 'opacity-10' : 'opacity-100'
+							} text-xl bg-white text-black border-4 border-black rounded-xl p-1 w-24`}
+						>
+							={' '}
+							{Math.round((currentSolution.answer + Number.EPSILON) * 100) /
+								100}
+						</p>
+					</div>
+				</div>
+
+				<div className='flex flex-col items-center justify-center'>
+					{unusedSolutions.map((solution) => {
+						console.log('unusedSolutions :: ', unusedSolutions)
+						console.log('solution :: ', solution)
+						return (
+							<div className='flex gap-2 bg-green-200x m-1 items-center justify-center'>
+								{solution.map((emptyCard, i) => {
+									return (
+										<div
+											key={`${emptyCard}-${i}`}
+											// onClick={() => moveToHand(card)}
+											className='bg-gray-100 border-gray-100 opacity-75 w-10 h-10 flex justify-center items-center rounded-full border-2'
+										>
+											{emptyCard}
+										</div>
+									)
+								})}
+								{/* Solution */}
+								<div
+									style={
+										allSolutions.length === 10
+											? { display: 'none' }
+											: { display: 'flex' }
+									}
+									className=' flex-col flex-wrap items-center gap-2'
+								>
+									{/* <p className='text-2xl'>Solution: {currentSolution.answer}</p> */}
+									<p
+										className={`opacity-10 text-xl bg-white text-black border-4 border-black rounded-xl p-1 w-24`}
+									>
+										={' '}
+									</p>
+								</div>
+							</div>
+						)
+					})}
 				</div>
 			</div>
 
@@ -382,32 +468,25 @@ const GameScreen = (props) => {
 					<div>
 						<button
 							className={
-								currentAttempt.length > 0
-									? 'bg-red-800 w-16 h-12 px-2c m-4 rounded font-bold text-white'
-									: 'bg-gray-400  w-16 h-12 px-2c m-4 rounded font-bold text-white hiddenx'
+								currentAttempt.length === 0 ||
+								currentAttempt.length === puzzle.split(',').length
+									? 'bg-gray-400   h-12 px-4 m-4 rounded font-bold text-white'
+									: 'bg-purple-800 h-12 px-4 m-4 rounded font-bold text-white'
 							}
 							onClick={() => {
-								setCurrentAttempt([])
-								setCurrentSolution({ answer: '0' })
-								// window.location.reload(false)
-							}}
-						>
-							AC
-						</button>
-						<button
-							className={
-								currentAttempt.length > 0
-									? 'bg-purple-800 w-16 h-12 px-2c m-4 rounded font-bold text-white'
-									: 'bg-gray-400  w-16 h-12 px-2c m-4 rounded font-bold text-white hiddenx'
-							}
-							onClick={() => {
-								moveToHand(currentAttempt[currentAttempt.length - 1])
+								if (
+									currentAttempt.length > 0 &&
+									currentAttempt.length !== puzzle.split(',').length
+								) {
+									moveToHand(currentAttempt[currentAttempt.length - 1])
+								}
+
 								// setCurrentAttempt([])
 								// setCurrentSolution({ answer: '0' })
 								// window.location.reload(false)
 							}}
 						>
-							DEL
+							DELETE
 						</button>
 					</div>
 				</div>
@@ -418,7 +497,7 @@ const GameScreen = (props) => {
 
 const TopBar = (props) => {
 	const {
-		back,
+		// back,
 		toggleHint,
 		showingHint,
 		showingObjective,
@@ -440,7 +519,8 @@ const TopBar = (props) => {
 					onClick={() => {
 						// let confirm_response = window.confirm('Going Back?')
 						// if (confirm_response) back()
-						back()
+						// back()
+						window.location.reload(false)
 					}}
 					className='inline-block w-24 py-1 rounded bg-purple-500 text-white font-bold'
 				>
