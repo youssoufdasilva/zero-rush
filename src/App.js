@@ -195,12 +195,12 @@ const ConfirmPuzzle = (props) => {
 		let is_good = answers.sunrise.permutationCount === 1
 		let has_float = answers.sunrise.floatDetected
 		if (is_good && has_zero) {
-			custom_style = `border-4 border-green-500 bg-green-500 ${
+			custom_style = `border-4 border-green-500 bg-green-800 ${
 				has_float ? 'border-dotted' : 'border-solid'
 			}`
 			status = "Let's Go!"
 		} else if (is_good) {
-			custom_style = `border-4 border-purple-800 bg-green-500 ${
+			custom_style = `border-4 border-purple-800 bg-green-800 ${
 				has_float ? 'border-dotted' : 'border-solid'
 			}`
 			status = 'Decent!'

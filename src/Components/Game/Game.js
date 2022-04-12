@@ -219,25 +219,10 @@ const GameScreen = (props) => {
 
 						return (
 							<li key={i} className={`flex gap-2 my-1 items-center`}>
-								{/* ({allSolutions.length - i}) {'=>'} {this_solution.attempt} ={' '} */}
-								{/* ({i + 1}) {'=>'} {this_solution.attempt} ={' '}
-							{this_solution.solution} */}
 								{this_solution.attempt.split(',').map((card, i) => {
-									// bg-gray-100 border-gray-100 opacity-75 w-12 h-12 flex justify-center items-center rounded-full border-2
-									// return (
-									// 	<div
-									// 		key={`${card}-${i}`}
-									// 		// onClick={() => moveToHand(card)}
-									// 		className={`w-8 h-8 flex justify-center items-center rounded-full ${style}`}
-									// 	>
-									// 		{/* {i !== 0 ? card : card.substring(1, card.length)} */}
-									// 		{card}
-									// 	</div>
-									// )
 									return (
 										<div
 											key={`${card}-${i}`}
-											// onClick={() => moveToHand(card)}
 											className={`border-gray-100x opacity-75x w-10 h-10 flex justify-center items-center rounded-full border-2  ${style}`}
 										>
 											{card}
@@ -533,7 +518,7 @@ const TopBar = (props) => {
 								showingHint ? 'opacity-100' : 'opacity-50'
 							}`}
 						>
-							<span className='bg-green-800 py-1 px-3 text-white font-bold rounded-lg text-center cursor-pointer'>
+							<span className='bg-blue-800 py-1 px-3 text-white font-bold rounded-lg text-center cursor-pointer'>
 								<p
 									onClick={() => {
 										if (totalSolutions < 2) {
@@ -561,7 +546,7 @@ const TopBar = (props) => {
 										: '-'
 									: null}
 							</span>
-							<span className='bg-blue-800 py-1 px-3 text-white font-bold rounded-lg text-center cursor-pointer'>
+							<span className='bg-green-800 py-1 px-3 text-white font-bold rounded-lg text-center cursor-pointer'>
 								<p
 									onClick={() => {
 										if (totalSolutions < 2) {
