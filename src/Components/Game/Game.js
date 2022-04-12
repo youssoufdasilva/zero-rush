@@ -148,7 +148,7 @@ const GameScreen = (props) => {
 	return (
 		<div
 			style={visible ? { display: 'flex' } : { display: 'none' }}
-			className='h-screen flex-col justify-between items-center font-bold w-full bg-purple-200'
+			className='h-screen flex-col justify-between items-center font-bold w-full bg-purple-200 md:max-w-md mx-auto my-0'
 		>
 			<TopBar
 				totalSolutions={allSolutions.length}
@@ -353,12 +353,10 @@ const GameScreen = (props) => {
 						{/* <p className='text-2xl'>Solution: {currentSolution.answer}</p> */}
 						<p
 							className={`${
-								currentAttempt.length === 0 ? 'opacity-10' : 'opacity-100'
-							} text-xl bg-white text-black border-4 border-black rounded-xl p-1 w-24`}
+								currentAttempt.length === 0 ? 'bg-gray-100' : 'bg-white'
+							} text-base bg-white text-black border-4 border-black rounded-xl p-1 w-20`}
 						>
-							={' '}
-							{Math.round((currentSolution.answer + Number.EPSILON) * 100) /
-								100}
+							= {currentSolution.answer}
 						</p>
 					</div>
 				</div>

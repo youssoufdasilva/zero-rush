@@ -96,6 +96,7 @@ const generateAnswers = (puzzle) => {
 			puzzle_answers[solved_puzzle.answer] = {
 				puzzle: solved_puzzle.puzzle,
 				permutationCount: currentPermCount + 1,
+				floatDetected: solved_puzzle.float_detected,
 			}
 		}
 	}
@@ -125,6 +126,7 @@ const generateAnswers = (puzzle) => {
 			// answer: puzzle_answers[all_answers[0]],
 			answer: puzzle_answers[all_answers[0]].puzzle,
 			permutationCount: puzzle_answers[all_answers[0]].permutationCount,
+			floatDetected: puzzle_answers[all_answers[0]].floatDetected,
 		}
 
 		// console.log(
@@ -138,6 +140,7 @@ const generateAnswers = (puzzle) => {
 			// answer: puzzle_answers[all_answers[last_ans]],
 			answer: puzzle_answers[all_answers[last_ans]].puzzle,
 			permutationCount: puzzle_answers[all_answers[last_ans]].permutationCount,
+			floatDetected: puzzle_answers[all_answers[0]].floatDetected,
 		}
 	} else {
 		return {
@@ -196,7 +199,8 @@ function sanitizePuzzle(puzzle) {
 function solvePuzzle(puzzle_to_solve) {
 	// console.log('\nPuzzle to Solve: ', puzzle)
 	var puzzle = sanitizePuzzle(puzzle_to_solve)
-	let my_puzzle_answer = 0
+	let my_puzzle_answer = 0,
+		float_detected = false
 	for (let index = 0; index < puzzle.length; index++) {
 		if (index === 0) {
 			my_puzzle_answer = Number(puzzle[0].substring(1, puzzle[0].length))
@@ -216,10 +220,21 @@ function solvePuzzle(puzzle_to_solve) {
 			} else {
 				return -1
 			}
+
+			if (!Number.isInteger(my_puzzle_answer)) {
+				// Testing whether puzzles are harder when decimals are detected
+				float_detected = true
+			}
 		}
 	}
 	// console.log(`Answer for ${puzzle} is: ${my_puzzle_answer}`)
-	return { answer: my_puzzle_answer, puzzle: puzzle }
+
+	return {
+		answer: Math.round((my_puzzle_answer + Number.EPSILON) * 100) / 100,
+		raw_answer: my_puzzle_answer,
+		float_detected: float_detected,
+		puzzle: puzzle,
+	}
 }
 
 // Function to Generate the puzzle based on the length passed

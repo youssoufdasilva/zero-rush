@@ -112,7 +112,7 @@ const App = () => {
 
 	return (
 		// Welcome Screen
-		<div className='w-full md:max-w-md mx-auto my-0'>
+		<div className='w-full md:max-w-mdx mx-auto my-0 bg-purple-200'>
 			{/* WelcomeScreen */}
 			<SimpleWelcomeScreen
 				visible={showWelcome}
@@ -193,17 +193,26 @@ const ConfirmPuzzle = (props) => {
 	if (answers !== null && answers.has_valid_ans) {
 		let has_zero = answers.sunset.result === '0'
 		let is_good = answers.sunrise.permutationCount === 1
+		let has_float = answers.sunrise.floatDetected
 		if (is_good && has_zero) {
-			custom_style = 'border-4 border-green-500 bg-green-500'
+			custom_style = `border-4 border-green-500 bg-green-500 ${
+				has_float ? 'border-dotted' : 'border-solid'
+			}`
 			status = "Let's Go!"
 		} else if (is_good) {
-			custom_style = 'border-4 border-yellow-500 bg-green-500'
+			custom_style = `border-4 border-purple-800 bg-green-500 ${
+				has_float ? 'border-dotted' : 'border-solid'
+			}`
 			status = 'Decent!'
 		} else if (has_zero) {
-			custom_style = 'border-4 border-green-500 bg-purple-800'
+			custom_style = `border-4 border-green-500 bg-purple-800 ${
+				has_float ? 'border-dotted' : 'border-solid'
+			}`
 			status = 'Has Zero!'
 		} else {
-			custom_style = 'border-4 border-yellow-200 bg-purple-800'
+			custom_style = `border-4 border-yellow-200 bg-purple-800 ${
+				has_float ? 'border-dotted' : 'border-solid'
+			}`
 			status = 'Not Garbage!'
 		}
 	} else if (answers !== null && !answers.has_valid_ans) {
@@ -257,7 +266,7 @@ const ConfirmPuzzle = (props) => {
 							<p>
 								Lowest:{' '}
 								{`${answers && answers.sunset ? answers.sunset.result : '-'}`}
-								{` (# of perm: ${
+								{` (Perm #: ${
 									answers && answers.sunset
 										? answers.sunset.permutationCount
 										: '-'
@@ -266,7 +275,7 @@ const ConfirmPuzzle = (props) => {
 							<p>
 								Highest:{' '}
 								{`${answers && answers.sunrise ? answers.sunrise.result : '-'}`}
-								{` (# of perm: ${
+								{` (Perm #: ${
 									answers && answers.sunrise
 										? answers.sunrise.permutationCount
 										: '-'
@@ -388,7 +397,7 @@ const SimpleWelcomeScreen = (props) => {
 	return (
 		<div
 			style={visible ? { display: 'flex' } : { display: 'none' }}
-			className='h-screen flex-col justify-center items-center font-bold bg-purple-200'
+			className='h-screen flex-col justify-center items-center font-bold bg-purple-200 w-fullx md:max-w-md mx-auto my-0 '
 		>
 			<p className='text-3xl'>Welcome to</p>
 			<p className='text-4xl'>ZERO RUSH!</p>
