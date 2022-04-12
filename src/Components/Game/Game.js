@@ -96,7 +96,7 @@ const GameScreen = (props) => {
 				})
 				setAllSolutions(temp_all_sols)
 				setCurrentAttempt([])
-				setCurrentSolution({ answer: '-' })
+				setCurrentSolution({ answer: '0' })
 
 				if (temp_solution.answer.toString() === answers.sunset.result) {
 					let temp_found_answers = foundAnswers
@@ -223,7 +223,7 @@ const GameScreen = (props) => {
 									return (
 										<div
 											key={`${card}-${i}`}
-											className={`border-gray-100x opacity-75x w-10 h-10 flex justify-center items-center rounded-full border-2  ${style}`}
+											className={`border-gray-100x opacity-75x w-8 h-8 flex justify-center items-center rounded-full border-2  ${style}`}
 										>
 											{card}
 										</div>
@@ -244,48 +244,13 @@ const GameScreen = (props) => {
 								>
 									{/* <p className='text-2xl'>Solution: {currentSolution.answer}</p> */}
 									<p
-										className={`opacity-100 text-xl bg-whitex text-blackx border-4 border-blackx rounded-xl p-1 w-24  ${style}`}
+										className={`opacity-100 text-xs bg-whitex text-blackx border-4 border-blackx rounded-xl p-1 w-20  ${style}`}
 									>
 										= {this_solution.solution}
 									</p>
 								</div>
 							</li>
 						)
-
-						// return (
-						// 	<div
-						// 		key={i}
-						// 		className='flex gap-2 bg-green-200x m-1 items-center justify-center'
-						// 	>
-						// 		{solution.map((emptyCard, i) => {
-						// 			return (
-						// 				<div
-						// 					key={`${emptyCard}-${i}`}
-						// 					// onClick={() => moveToHand(card)}
-						// 					className='bg-gray-100 border-gray-100 opacity-75 w-10 h-10 flex justify-center items-center rounded-full border-2'
-						// 				>
-						// 					{emptyCard}
-						// 				</div>
-						// 			)
-						// 		})}
-						// 		{/* Solution */}
-						// 		<div
-						// 			style={
-						// 				allSolutions.length === 10
-						// 					? { display: 'none' }
-						// 					: { display: 'flex' }
-						// 			}
-						// 			className=' flex-col flex-wrap items-center gap-2'
-						// 		>
-						// 			{/* <p className='text-2xl'>Solution: {currentSolution.answer}</p> */}
-						// 			<p
-						// 				className={`opacity-10 text-xl bg-white text-black border-4 border-black rounded-xl p-1 w-24`}
-						// 			>
-						// 				={' '}
-						// 			</p>
-						// 		</div>
-						// 	</div>
-						// )
 					})}
 				</div>
 
@@ -303,7 +268,7 @@ const GameScreen = (props) => {
 										<div
 											key={`${card}-${i}`}
 											onClick={() => moveToHand(card)}
-											className='bg-white border-white w-10 h-10 flex justify-center items-center rounded-full border-2'
+											className='bg-white border-white w-8 h-8 flex justify-center items-center rounded-full border-2'
 										>
 											{i !== 0 ? card : card.substring(1, card.length)}
 										</div>
@@ -318,7 +283,7 @@ const GameScreen = (props) => {
 										<div
 											key={`${emptyCard}-${i}`}
 											// onClick={() => moveToHand(card)}
-											className='bg-gray-100 border-gray-100 opacity-75 w-10 h-10 flex justify-center items-center rounded-full border-2'
+											className='bg-gray-100 border-gray-100 opacity-75 w-8 h-8 flex justify-center items-center rounded-full border-2'
 										>
 											{emptyCard}
 										</div>
@@ -346,6 +311,7 @@ const GameScreen = (props) => {
 					</div>
 				</div>
 
+				{/* unused solutions */}
 				<div className='flex flex-col items-center justify-center'>
 					{unusedSolutions.map((solution) => {
 						console.log('unusedSolutions :: ', unusedSolutions)
@@ -357,7 +323,7 @@ const GameScreen = (props) => {
 										<div
 											key={`${emptyCard}-${i}`}
 											// onClick={() => moveToHand(card)}
-											className='bg-gray-100 border-gray-100 opacity-75 w-10 h-10 flex justify-center items-center rounded-full border-2'
+											className='bg-gray-100 border-gray-100 opacity-75 w-8 h-8 flex justify-center items-center rounded-full border-2'
 										>
 											{emptyCard}
 										</div>
@@ -374,7 +340,7 @@ const GameScreen = (props) => {
 								>
 									{/* <p className='text-2xl'>Solution: {currentSolution.answer}</p> */}
 									<p
-										className={`opacity-10 text-xl bg-white text-black border-4 border-black rounded-xl p-1 w-24`}
+										className={`opacity-10 text-xl bg-white text-black border-4 border-black rounded-xl p-1 w-20`}
 									>
 										={' '}
 									</p>
@@ -412,7 +378,7 @@ const GameScreen = (props) => {
 					</button>
 				</div>
 			) : (
-				<div className='flex flex-col justify-center items-center mb-4 gap-2'>
+				<div className='flex flex-col justify-center items-center mb-2 gap-2'>
 					<div className='flex gap-2 border-white'>
 						{/* Hand */}
 						{puzzle !== null
@@ -434,7 +400,7 @@ const GameScreen = (props) => {
 											}}
 											className={`${
 												card_available ? 'bg-white' : 'bg-gray-400'
-											} p-2x w-12 h-12 flex flex-col justify-center items-center text-2xl rounded border-4 ${
+											} p-2x w-10 h-10 flex flex-col justify-center items-center text-2xl rounded border-4 ${
 												sunrise_hint
 													? 'border-green-400'
 													: sunset_hint
@@ -533,7 +499,7 @@ const TopBar = (props) => {
 									}}
 								>
 									Lowest:{' '}
-									{my_answers.has_valid_ans ? my_answers.sunset.result : '-'}
+									{my_answers.has_valid_ans ? my_answers.sunset.result : '0'}
 								</p>
 								{showLowestSolution
 									? my_answers.has_valid_ans
@@ -543,7 +509,7 @@ const TopBar = (props) => {
 													1,
 													my_answers.sunset.answer.toString().length
 												)
-										: '-'
+										: '0'
 									: null}
 							</span>
 							<span className='bg-green-800 py-1 px-3 text-white font-bold rounded-lg text-center cursor-pointer'>
@@ -563,7 +529,7 @@ const TopBar = (props) => {
 									}}
 								>
 									Highest:
-									{my_answers.has_valid_ans ? my_answers.sunrise.result : '-'}
+									{my_answers.has_valid_ans ? my_answers.sunrise.result : '0'}
 								</p>
 								{showHighestSolution
 									? my_answers.has_valid_ans
@@ -573,7 +539,7 @@ const TopBar = (props) => {
 													1,
 													my_answers.sunrise.answer.toString().length
 												)
-										: '-'
+										: '0'
 									: null}
 							</span>
 						</div>
