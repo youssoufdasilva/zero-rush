@@ -71,7 +71,7 @@ const App = () => {
 
 		if (experiement) {
 			my_puzzle_string = generatePuzzle(
-				5,
+				4,
 				{ min: 1, max: 9 }, //plusRange
 				{ min: 1, max: 9 }, //minusRange
 				{ min: 1, max: 9 }, //multRange
@@ -112,7 +112,7 @@ const App = () => {
 
 	return (
 		// Welcome Screen
-		<div className='w-full md:max-w-mdx mx-auto my-0 bg-purple-200'>
+		<div className='w-full md:max-w-mdx mx-auto my-0 bg-purple-200x'>
 			{/* WelcomeScreen */}
 			<SimpleWelcomeScreen
 				visible={showWelcome}
@@ -185,7 +185,8 @@ const ConfirmPuzzle = (props) => {
 	const { puzzle, answers, start, clear, isRushing, rushFound } = props
 
 	const [showingStats, setShowingStats] = useState(false)
-	const [showingGoal, setShowingGoal] = useState(false)
+	// const [showingGoal, setShowingGoal] = useState(false)
+	const [showingGoal, setShowingGoal] = useState(true)
 
 	if (puzzle === null && isRushing === false) return null
 
@@ -400,7 +401,13 @@ const SimpleWelcomeScreen = (props) => {
 			className='h-screen flex-col justify-center items-center font-bold bg-purple-200 w-fullx md:max-w-md mx-auto my-0 '
 		>
 			<p className='text-3xl'>Welcome to</p>
-			<p className='text-4xl'>ZERO RUSH!</p>
+			<p className='text-4xl'>OVERZERO!</p>
+
+			<div className='m-4 text-center'>
+				<p className='text-xl'>Get 6 chances to guess</p>
+				<p className='text-xl'>the lowest and highest</p>
+				<p className='text-xl'>numbers</p>
+			</div>
 			<div>
 				<button
 					onClick={() => {

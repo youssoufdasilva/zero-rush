@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+  overzero:
+    build:
+      context: ./app
+      dockerfile: docker/Dockerfile
+    volumes:
+      - ./app:/app
+    ports:
+      - "43002:43002"
+    # expose:
+    #   - 43002
+    restart: unless-stopped
+
+networks:
+  default:
+    external: true
+    name: nginx-proxy-manager
