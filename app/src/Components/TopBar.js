@@ -33,7 +33,7 @@ const TopBar = (props) => {
 				</button>
 
 				<div className='flex flex-col justify-start items-center gap-x-2 w-full h-full'>
-					<p className='text-2xl'>ZERO RUSH</p>
+					<p className='text-2xl'>OverZero | Game</p>
 					<div className={showingObjective ? 'visible text-xs' : 'invisible'}>
 						<div
 							className={`w-full flex flex-row flex-wrap justify-center items-center p-1 gap-1 ${

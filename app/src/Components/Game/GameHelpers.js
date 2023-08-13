@@ -5,6 +5,7 @@ function toPuzzle(signature) {
 
 // Function to return a string representation of a puzzle
 function toSignature(puzzle) {
+	// +2 /4 x3 -4 => a2d4m3s4
 	console.log('toSignature', puzzle)
 }
 

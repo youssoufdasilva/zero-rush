@@ -6,7 +6,7 @@ const GameScreen = (props) => {
 	const { puzzle, answers, visible, back /* search */ } = props
 
 	// const currentHand = visible && puzzle !== null ? puzzle.split(',') : []
-	const max_solution = 6
+	const max_solution = 10
 
 	const [currentAttempt, setCurrentAttempt] = useState([])
 	const [unusedAttempts, setUnusedAttempts] = useState([])
@@ -74,22 +74,10 @@ const GameScreen = (props) => {
 		return null
 	}
 
-	const moveToAttempt = (card) => {
-		// console.log('Moving: ', card)
-
-		let temp_attempt = currentAttempt
-		temp_attempt.push(card)
-		setCurrentAttempt(temp_attempt)
-
-		// if (temp_attempt.length > 1) {
-		let temp_solution = solvePuzzle(temp_attempt)
-		setCurrentSolution(temp_solution)
-		// console.log('SOLUTION = ', temp_solution)
-
-		if (temp_attempt.length === puzzle.split(',').length) {
-			// wait 1 second
-			setTimeout(() => {
-				let temp_all_sols = allSolutions
+	const submitAttempt = () => {
+		const temp_attempt = currentAttempt;
+		const temp_solution = currentSolution;
+		let temp_all_sols = allSolutions
 				let temp_att_string = temp_attempt.toString()
 				temp_all_sols.push({
 					attempt: temp_att_string.substring(1, temp_att_string.length),
@@ -118,8 +106,27 @@ const GameScreen = (props) => {
 				if (foundAnswers[0] && foundAnswers[1]) {
 					setShowingHint(true)
 				}
-			}, 1000)
-		}
+	}
+
+	const moveToAttempt = (card) => {
+		// console.log('Moving: ', card)
+
+		let temp_attempt = currentAttempt
+		temp_attempt.push(card)
+		setCurrentAttempt(temp_attempt)
+
+		// if (temp_attempt.length > 1) {
+		let temp_solution = solvePuzzle(temp_attempt)
+		setCurrentSolution(temp_solution)
+		// console.log('SOLUTION = ', temp_solution)
+
+		// if (temp_attempt.length === puzzle.split(',').length) {
+		// 	// wait 1 second
+		// 	setTimeout(() => {
+		// 		// submit answer
+		// 		submitAttempt(temp_attempt, temp_solution)
+		// 	}, 1000)
+		// }
 
 		updateUnusedAttempts()
 		// }
@@ -147,17 +154,17 @@ const GameScreen = (props) => {
 	}
 
 	return (
+		<div style={visible ? { display: 'flex' } : { display: 'none' }}
+		className='h-screen bg-purple-200'>
+
 		<div
-			style={visible ? { display: 'flex' } : { display: 'none' }}
-			className='h-screen flex-col justify-between items-center font-bold w-full bg-purple-200 md:max-w-md mx-auto my-0'
+			style={{ height: 'calc(100vh - 20vh)'}}
+			className='flex flex-col justify-between items-center font-bold w-full md:max-w-md mx-auto my-0'
+
 		>
 			<TopBar
 				totalSolutions={allSolutions.length}
-				// back={() => {
-				// 	setAllSolutions([])
-				// 	setCurrentAttempt([])
-				// 	back()
-				// }}
+
 				showingHint={showingHint}
 				toggleHint={() => {
 					// alert('pause game')
@@ -173,8 +180,8 @@ const GameScreen = (props) => {
 
 			<div className='flex flex-col w-full px-4'>
 				<div className='flex flex-col flex-wrap items-center gap-2 p-2 mx-4 text-xs'>
-					{foundAnswers[1] ? (
-						<div className='text-center'>
+					{foundAnswers[0] && foundAnswers[1] ? (
+						<div className='text-center my-4'>
 							<p>Congrats! You Found all target answers!</p>
 
 							<button
@@ -188,13 +195,13 @@ const GameScreen = (props) => {
 								}}
 								className='bg-purple-500 rounded px-3 py-1 shadow-lg text-white font-bold'
 							>
-								Reload Page
+								Start New Round!
 							</button>
 						</div>
 					) : null}
 				</div>
 				{/* Past Solution */}
-				<div className='flex flex-col items-center justify-center'>
+				<div className='flex flex-col text-xs items-center justify-center'>
 					{allSolutions.map((this_solution, i) => {
 						const valid_sunset =
 							this_solution.solution.toString() === answers.sunset.result
@@ -224,7 +231,7 @@ const GameScreen = (props) => {
 									return (
 										<div
 											key={`${card}-${i}`}
-											className={`border-gray-100x opacity-75x w-8 h-8 flex justify-center items-center rounded-full border-2  ${style}`}
+											className={`border-gray-100x opacity-75x w-6 h-6 flex justify-center items-center rounded-full border-2  ${style}`}
 										>
 											{card}
 										</div>
@@ -245,7 +252,7 @@ const GameScreen = (props) => {
 								>
 									{/* <p className='text-2xl'>Solution: {currentSolution.answer}</p> */}
 									<p
-										className={`opacity-100 text-xs bg-whitex text-blackx border-4 border-blackx rounded-xl p-1 w-20  ${style}`}
+										className={`opacity-100 text-xs bg-whitex text-blackx border-2 border-blackx rounded-xl p-1 w-20  ${style}`}
 									>
 										= {this_solution.solution}
 									</p>
@@ -258,8 +265,8 @@ const GameScreen = (props) => {
 				{/* Current Attempt */}
 				<div
 					className={`${
-						allSolutions.length === max_solution ? 'none' : 'flex'
-					} gap-2 my-2x w-full justify-center items-center`}
+						allSolutions.length === max_solution ? 'hidden' : 'flex flex-col'
+					} gap-2 text-xl mt-8 w-full justify-center items-center`}
 				>
 					<div className='flex gap-2 my-2 '>
 						{/* Attempt */}
@@ -305,9 +312,9 @@ const GameScreen = (props) => {
 						<p
 							className={`${
 								currentAttempt.length === 0 ? 'bg-gray-100' : 'bg-white'
-							} text-base bg-white text-black border-4 border-black rounded-xl p-1 w-20`}
+							} text-base- text-xl text-center bg-white text-black border-4 border-black rounded-xl p-1 w-20`}
 						>
-							= {currentSolution.answer}
+							 {currentSolution.answer}
 						</p>
 					</div>
 				</div>
@@ -417,15 +424,13 @@ const GameScreen = (props) => {
 					<div>
 						<button
 							className={
-								currentAttempt.length === 0 ||
-								currentAttempt.length === puzzle.split(',').length
-									? '  bg-gray-400 h-12 px-4 m-4 rounded font-bold text-white'
-									: 'bg-purple-800 h-12 px-4 m-4 rounded font-bold text-white'
+								currentAttempt.length === 0
+									? 'cursor-not-allowed bg-gray-400 h-12 px-4 m-4 rounded font-bold text-white'
+									: 'bg-red-800 h-12 px-4 m-4 rounded font-bold text-white'
 							}
 							onClick={() => {
 								if (
-									currentAttempt.length > 0 &&
-									currentAttempt.length !== puzzle.split(',').length
+									currentAttempt.length > 0
 								) {
 									moveToHand(currentAttempt[currentAttempt.length - 1])
 								}
@@ -437,9 +442,26 @@ const GameScreen = (props) => {
 						>
 							DELETE
 						</button>
+
+						<button
+						className={
+							currentAttempt.length !== puzzle.split(',').length
+								? 'cursor-not-allowed bg-gray-400 h-12 px-4 m-4 rounded font-bold text-white'
+								: 'bg-green-800 h-12 px-4 m-4 rounded font-bold text-white'
+						}
+							onClick={()=>{
+								if (
+									currentAttempt.length === puzzle.split(',').length
+								) {
+									submitAttempt()}
+								}}
+						>
+							SUBMIT
+						</button>
 					</div>
 				</div>
 			)}
+		</div>
 		</div>
 	)
 }
