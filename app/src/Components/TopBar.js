@@ -3,6 +3,8 @@ import React, {useState} from 'react';
 const TopBar = (props) => {
 	const {
 		// back,
+		showingHowTo,
+		toggleHowTo,
 		toggleHint,
 		showingHint,
 		showingObjective,
@@ -27,10 +29,38 @@ const TopBar = (props) => {
 						// back()
 						window.location.reload(false)
 					}}
-					className='inline-block w-24 py-1 rounded bg-purple-500 text-white font-bold'
+					className='hidden inline-block w-24 py-1 rounded bg-purple-500 text-white font-bold'
 				>
 					Back
 				</button>
+				<div className='w-24 flex flex-col'>
+					<button
+						onClick={() => {
+							// toggleObjective()
+							window.location.reload(false)
+						}}
+						className='inline-block py-1 w-full m-1 rounded bg-purple-500 text-white font-bold'
+
+						// className={`inline-block py-1 w-full m-1 rounded bg-purple-500 text-white font-bold ${
+						// 	showingObjective ? 'opacity-100' : 'opacity-50'
+						// }`}
+					>
+						{/* {showingObjective ? 'Hide Goal' : 'Show Goal'} */}
+						Exit
+					</button>
+					<button
+						onClick={() => {
+							// toggleHint()
+							toggleHowTo()
+						}}
+						className={`inline-block py-1 w-full m-1 rounded bg-purple-500 text-white font-bold ${
+							showingHowTo ? 'opacity-100' : 'opacity-50'
+						}`}
+					>
+						{/* {showingHint ? 'Hide Hint' : 'Show Hint'} */}
+						Rules
+					</button>
+				</div>
 
 				<div className='flex flex-col justify-start items-center gap-x-2 w-full h-full'>
 					<p className='text-2xl'>OverZero | Game</p>

@@ -58,7 +58,7 @@ import HowTo from './HowTo';
 // }
 
 const SimpleWelcomeScreen = (props) => {
-	const { visible, search, prevSearch, historyLength, children } = props
+	const { visible, search, prevSearch, historyLength, toggleGameSelect, children } = props
 
 	const [searchText, setSearchText] = useState('')
     const [showHowTo, setShowHowTo] = useState(false)
@@ -82,14 +82,17 @@ const SimpleWelcomeScreen = (props) => {
 			<p className='text-3xl'>Welcome to</p>
 			<p className='text-4xl'>OVERZERO!</p>
 
-			<div className='m-6 p-2 bg-gray-700 text-white' 
-            onClick={()=>{setShowHowTo(!showHowTo)}}>
-                {showHowTo ? 'Close' : "How To Play" }
-                </div>
+			<div className='m-6 p-2 bg-gray-700 text-white rounded' 
+            	onClick={()=>{
+					toggleGameSelect(showHowTo)
+				setShowHowTo(!showHowTo)}}
+			>
+                {showHowTo ? 'Close Rules' : "How To Play" }
+            </div>
 
-            {showHowTo && <HowTo/>} 
+            {showHowTo && <div style={{height: "calc(100vh / 2)", overflowY: "auto"}}><HowTo/></div>} 
 
-			<div>
+			{!showHowTo && <div>
 				<button
 					onClick={() => {
 						search()
@@ -113,7 +116,7 @@ const SimpleWelcomeScreen = (props) => {
 				>
 					{searchText}
 				</button>
-			</div>
+			</div>}
 			{children}
 		</div>
 	)

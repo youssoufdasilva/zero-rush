@@ -8,6 +8,7 @@ import { generatePuzzle, generateAnswers } from './Components/Game/GameHelpers'
 
 const App = () => {
 	const [showWelcome, setShowWelcome] = useState(true)
+	const [showGameSelect, setShowGameSelect] = useState(true)
 	const [showGame, setShowGame] = useState(false)
 	const [generatedPuzzle, setGeneratedPuzzle] = useState(null)
 	const [generatedAnswers, setGeneratedAnswers] = useState(null)
@@ -120,7 +121,6 @@ const App = () => {
 			<SimpleWelcomeScreen
 				visible={showWelcome}
 				search={() => {
-					// searchPuzzle()
 					searchPuzzle(true)
 				}}
 				prevSearch={() => {
@@ -136,6 +136,9 @@ const App = () => {
 					// temp_history.splice(temp_history.length - 1, 1)
 				}}
 				historyLength={searchHistory.length}
+				toggleGameSelect={(value)=>{
+					setShowGameSelect(value)
+				}}
 				// experiemtalSearch={() => {
 				// 	searchPuzzle(true)
 				// }}
@@ -150,7 +153,7 @@ const App = () => {
 			>
 				<React.Fragment>
 					{/* {isRushing} */}
-					<ConfirmPuzzle
+					{showGameSelect && <ConfirmPuzzle
 						puzzle={generatedPuzzle}
 						answers={generatedAnswers}
 						start={() => {
@@ -162,7 +165,7 @@ const App = () => {
 						}}
 						isRushing={isRushing}
 						rushFound={rushFound}
-					/>
+					/>}
 				</React.Fragment>
 			</SimpleWelcomeScreen>
 

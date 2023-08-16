@@ -2,8 +2,7 @@ import React from 'react'
 
 const HowTo = (props) => {
  return (
-    <div style={{height: "calc(100vw /2)", overflowY: "auto"}} className='bg-purple-100'>
-
+    <div className='bg-purple-100 mx-4 smx-auto rounded'>
         <div className='m-4 text-center hidden'>
                     <p className='text-xl'>Get 6 chances to guess</p>
                     <p className='text-xl'>the lowest and highest</p>
@@ -19,21 +18,32 @@ const HowTo = (props) => {
                 Each card has a symbol (+, -, x, ÷) and a number (from 1 to 9).
             </p>
             <p className='m-2 text-2xl-'>
-                The goal is to arrange the cards in the right order to make the 
-                <strong> lowest or highest positive whole number.</strong>
+                The goal is to arrange the cards in the right order to make
+                <strong> the target numbers</strong>.
+            </p>
+            <p className='m-2 text-2xl-'>
+                The target numbers are
+                <strong> the <span className='bg-blue-600 round-full px-1 text-white font-bold'>lowest</span> 
+                {' '} and the <span className='bg-green-600 round-full px-1 text-white font-bold'>highest</span> 
+                 {' '} positive whole number </strong> that can be created by any arrangement of the hand.
+            </p>
+            <p className='m-2 text-2xl-'>
+                You can choose to find either the <span className='bg-blue-600 round-full px-1 text-white font-bold'>lowest</span> 
+                {' '} or the <span className='bg-green-600 round-full px-1 text-white font-bold'>highest</span> 
+                 {' '} first, but <strong>both must be found</strong> to complete the round.
             </p>
             <p className='m-2 text-2xl-'>
                 The number <strong>0 is allowed</strong>, but <strong>no negative numbers or decimals.</strong>
             </p>
             <p className='m-2 text-2xl-'>
-                <strong>Ignore the symbol</strong>on the first card you use. 
+                <strong>Ignore the symbol</strong> on the first card you use. 
                 It doesn't matter which card you choose but <strong>you can only use each card one time.</strong>
             </p>
             <p className='m-2- text-2xl-'>
-                After finding the lowest and highest numbers, 
+                After finding the target numbers, 
                 <strong> new cards are drawn for the next round.</strong>
             </p>
-            <p className='m-2 text-xl font-semibold'>Creating Equations</p>
+            <p className='m-2 text-xl font-semibold'>Creating Combinations</p>
 
             <p className='m-2 text-2xl-'>
                 Use the symbols and numbers on the remaining cards to create an equation.
@@ -48,7 +58,8 @@ const HowTo = (props) => {
             </p>
             <p className='text-sm-'>
                 This makes the number 0, so you found the right order for the 
-                <strong> lowest possible answer!</strong>
+                <strong> <span className='bg-blue-600 round-full px-1 text-white font-bold'>lowest</span> 
+                {' '} possible answer!</strong>
             </p>
             <p className='mt-2 text-2xl-'>
                 You could also arrange them as: {' '}
@@ -56,14 +67,16 @@ const HowTo = (props) => {
             </p>
             <p className='m-2- text-2xl-'>
                 This makes the number 39, so you found the right order for the 
-                <strong> highest possible answer!</strong>
+                <strong> <span className='bg-green-600 round-full px-1 text-white font-bold'>highest</span> 
+                {' '} possible answer!</strong>
+            </p>
+
+            {/* <p className='m-2 text-2xl-'>Tip</p> */}
+            <p className='m-2 text-2xl-'>
+            <strong>TIP:</strong> As shown in the example, multiplying and dividing by 0 are excellent ways to find the lowest possible number.
             </p>
             <p className='m-2 text-2xl-'>
-            Keep re-ordering your cards to find a combination that equals a positive whole number, either the lowest or highest you can make.
-            </p>
-            <p className='m-2 text-2xl-'>Tip</p>
-            <p className='m-2 text-2xl-'>
-            As shown in the example, multiplying and dividing by 0 are excellent ways to find the lowest possible number.
+            To find the highest, try doing all your additions before multiplying and doing your substractions after.
             </p>
 
 

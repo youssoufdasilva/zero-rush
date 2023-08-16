@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { solvePuzzle } from './GameHelpers'
 import TopBar from '../TopBar'
+import HowTo from '../HowTo'
 
 const GameScreen = (props) => {
 	const { puzzle, answers, visible, back /* search */ } = props
@@ -14,6 +15,7 @@ const GameScreen = (props) => {
 	const [unusedSolutions, setUnusedSolutions] = useState([])
 	const [allSolutions, setAllSolutions] = useState([])
 	const [showingHint, setShowingHint] = useState(false)
+	const [showingHowTo, setShowingHowTo] = useState(false)
 	const [showingObjective, setShowingObjective] = useState(false)
 	const [foundAnswers, setFoundAnswers] = useState([false, false])
 
@@ -153,23 +155,27 @@ const GameScreen = (props) => {
 		updateUnusedAttempts()
 	}
 
+	const isValidSolution = (answer) => {
+		return answer >= 0 && Number.isInteger(answer)
+	}
+
 	return (
 		<div style={visible ? { display: 'flex' } : { display: 'none' }}
-		className='h-screen bg-purple-200'>
-
-		<div
-			style={{ height: 'calc(100vh - 20vh)'}}
-			className='flex flex-col justify-between items-center font-bold w-full md:max-w-md mx-auto my-0'
-
-		>
+		className='h-screen bg-purple-200 flex flex-col w-full md:max-w-md mx-auto my-0'>
 			<TopBar
 				totalSolutions={allSolutions.length}
+
+				showingHowTo={showingHowTo}
+				toggleHowTo={()=>{
+					setShowingHowTo(!showingHowTo)
+				}}
 
 				showingHint={showingHint}
 				toggleHint={() => {
 					// alert('pause game')
 					setShowingHint(!showingHint)
 				}}
+
 				showingObjective={showingObjective}
 				toggleObjective={() => {
 					// alert('pause game')
@@ -178,6 +184,14 @@ const GameScreen = (props) => {
 				answers={answers}
 			/>
 
+		{showingHowTo && <div className='my-auto- p-4' style={{height: "calc((100vh) - 30vh)", overflowY: "auto"}}><HowTo/></div>} 
+
+		{!showingHowTo && <div
+			style={{ height: 'calc(100vh - 20vh)'}}
+			className='flex flex-col justify-between items-center font-bold '
+
+		>
+			<div></div>
 			<div className='flex flex-col w-full px-4'>
 				<div className='flex flex-col flex-wrap items-center gap-2 p-2 mx-4 text-xs'>
 					{foundAnswers[0] && foundAnswers[1] ? (
@@ -266,7 +280,7 @@ const GameScreen = (props) => {
 				<div
 					className={`${
 						allSolutions.length === max_solution ? 'hidden' : 'flex flex-col'
-					} gap-2 text-xl mt-8 w-full justify-center items-center`}
+					} select-none gap-2 text-xl mt-8 w-full justify-center items-center`}
 				>
 					<div className='flex gap-2 my-2 '>
 						{/* Attempt */}
@@ -312,7 +326,7 @@ const GameScreen = (props) => {
 						<p
 							className={`${
 								currentAttempt.length === 0 ? 'bg-gray-100' : 'bg-white'
-							} text-base- text-xl text-center bg-white text-black border-4 border-black rounded-xl p-1 w-20`}
+							} select-none text-base- text-3xl text-center bg-white text-black border-4 border-black rounded-xl p-1 w-36`}
 						>
 							 {currentSolution.answer}
 						</p>
@@ -403,11 +417,13 @@ const GameScreen = (props) => {
 											onClick={() => {
 												if (card_available) {
 													moveToAttempt(card)
+												} else {
+													moveToHand(card)
 												}
 											}}
 											className={`${
 												card_available ? 'bg-white' : 'bg-gray-400'
-											} p-2x w-10 h-10 flex flex-col justify-center items-center text-2xl rounded border-4 ${
+											} select-none p-2x w-10 h-10 flex flex-col justify-center items-center text-2xl rounded border-4 ${
 												sunrise_hint
 													? 'border-green-400'
 													: sunset_hint
@@ -432,26 +448,31 @@ const GameScreen = (props) => {
 								if (
 									currentAttempt.length > 0
 								) {
-									moveToHand(currentAttempt[currentAttempt.length - 1])
+									// For Delete
+									// moveToHand(currentAttempt[currentAttempt.length - 1])
+									
+									// For Clear
+									setCurrentAttempt([])
+									setCurrentSolution({ answer: '0' })
 								}
 
-								// setCurrentAttempt([])
-								// setCurrentSolution({ answer: '0' })
 								// window.location.reload(false)
 							}}
 						>
-							DELETE
+							CLEAR
 						</button>
 
 						<button
-						className={
-							currentAttempt.length !== puzzle.split(',').length
-								? 'cursor-not-allowed bg-gray-400 h-12 px-4 m-4 rounded font-bold text-white'
-								: 'bg-green-800 h-12 px-4 m-4 rounded font-bold text-white'
-						}
+						// className={`${
+						// 	allSolutions.length === max_solution ? 'hidden' : 'flex flex-col'
+						// } select-none gap-2 text-xl mt-8 w-full justify-center items-center`}
+						className={`
+							${currentAttempt.length === puzzle.split(',').length && isValidSolution(currentSolution.answer)
+								? 'bg-green-800' : 'cursor-not-allowed bg-gray-400'} h-12 px-4 m-4 rounded font-bold text-white
+						`}
 							onClick={()=>{
 								if (
-									currentAttempt.length === puzzle.split(',').length
+									currentAttempt.length === puzzle.split(',').length && isValidSolution(currentSolution.answer)
 								) {
 									submitAttempt()}
 								}}
@@ -461,7 +482,7 @@ const GameScreen = (props) => {
 					</div>
 				</div>
 			)}
-		</div>
+		</div>}
 		</div>
 	)
 }
