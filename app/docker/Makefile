@@ -1,3 +1,4 @@
+# DOES NOT WORK!
 start:
 	@docker compose -p game -f docker-compose.yml up -d
 
