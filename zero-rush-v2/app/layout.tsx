@@ -45,7 +45,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <header className="fixed top-0 right-0 p-4 z-50">
+        <header className="fixed bottom-0 right-0 p-4 z-50">
           <ThemeToggle />
         </header>
         {children}

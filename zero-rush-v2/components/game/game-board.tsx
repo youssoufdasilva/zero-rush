@@ -51,6 +51,7 @@ const DEFAULT_SETTINGS: GameSettings = {
   historyPlacement: "drawer",
   cardScaling: "scale",
 };
+const SETTINGS_STORAGE_KEY = "zero-rush.gameSettings";
 
 export interface GameBoardProps {
   /** Selected difficulty level */
@@ -66,6 +67,8 @@ export function GameBoard({ difficulty, onBack }: GameBoardProps) {
   const [shakeSubmit, setShakeSubmit] = useState(false);
   const [flashHistory, setFlashHistory] = useState(false);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
+  const autoSubmitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const prevCanSubmitRef = useRef(false);
 
   const {
     handCards,
@@ -99,6 +102,29 @@ export function GameBoard({ difficulty, onBack }: GameBoardProps) {
   useEffect(() => {
     setMaxHistoryLength(settings.maxHistoryLength);
   }, [settings.maxHistoryLength, setMaxHistoryLength]);
+
+  // Load settings from localStorage once on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(SETTINGS_STORAGE_KEY);
+      if (!stored) return;
+      const parsed = JSON.parse(stored) as Partial<GameSettings>;
+      if (parsed && typeof parsed === "object") {
+        setSettings(prev => ({ ...prev, ...parsed }));
+      }
+    } catch {
+      // Ignore malformed storage
+    }
+  }, []);
+
+  // Persist settings to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+    } catch {
+      // Ignore storage failures (private mode, quota, etc.)
+    }
+  }, [settings]);
 
   // Create unique IDs for arrangement cards
   const arrangementCardIds = useMemo(
@@ -145,11 +171,49 @@ export function GameBoard({ difficulty, onBack }: GameBoardProps) {
       return;
     }
 
+    const completesPuzzle =
+      (foundDusk || result.isDusk) && (foundDawn || result.isDawn);
+
     // Clear arrangement after successful submit if setting is enabled
-    if (settings.clearAfterSubmit && !isComplete) {
+    if (settings.clearAfterSubmit && !completesPuzzle) {
       clearArrangement();
     }
-  }, [submitAttempt, settings.clearAfterSubmit, isComplete, clearArrangement]);
+  }, [
+    submitAttempt,
+    settings.clearAfterSubmit,
+    foundDusk,
+    foundDawn,
+    clearArrangement,
+  ]);
+
+  // Auto-submit when enabled and ready
+  useEffect(() => {
+    if (!settings.autoSubmit) {
+      if (autoSubmitTimerRef.current) {
+        clearTimeout(autoSubmitTimerRef.current);
+        autoSubmitTimerRef.current = null;
+      }
+      prevCanSubmitRef.current = canSubmit;
+      return;
+    }
+
+    if (canSubmit && !prevCanSubmitRef.current && !isComplete) {
+      if (autoSubmitTimerRef.current) {
+        clearTimeout(autoSubmitTimerRef.current);
+      }
+      autoSubmitTimerRef.current = setTimeout(() => {
+        handleSubmit();
+      }, 500);
+    }
+
+    prevCanSubmitRef.current = canSubmit;
+
+    return () => {
+      if (autoSubmitTimerRef.current) {
+        clearTimeout(autoSubmitTimerRef.current);
+      }
+    };
+  }, [settings.autoSubmit, canSubmit, isComplete, handleSubmit]);
 
   // Build equation display string (first card shows just number, no operator)
   const equationDisplay = arrangementCards

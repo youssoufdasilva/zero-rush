@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Difficulty } from "@/lib/types/game";
 import { DIFFICULTY_CONFIG } from "@/lib/game/constants";
 import { Button } from "@/components/ui/button";
@@ -12,10 +12,28 @@ export interface HomeScreenProps {
 }
 
 const DIFFICULTIES: Difficulty[] = ["easy", "medium", "hard", "challenger"];
+const LAST_DIFFICULTY_KEY = "zero-rush.lastDifficulty";
 
 export function HomeScreen({ onStart }: HomeScreenProps) {
   const [selectedDifficulty, setSelectedDifficulty] =
     useState<Difficulty>("medium");
+
+  useEffect(() => {
+    const stored = localStorage.getItem(LAST_DIFFICULTY_KEY);
+    const isValid =
+      stored &&
+      DIFFICULTIES.includes(stored as Difficulty) &&
+      stored !== "challenger";
+
+    if (isValid) {
+      setSelectedDifficulty(stored as Difficulty);
+    }
+  }, []);
+
+  const handleStart = () => {
+    localStorage.setItem(LAST_DIFFICULTY_KEY, selectedDifficulty);
+    onStart(selectedDifficulty);
+  };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[80vh] gap-8 p-4">
@@ -86,7 +104,7 @@ export function HomeScreen({ onStart }: HomeScreenProps) {
 
       {/* Start Button */}
       <Button
-        onClick={() => onStart(selectedDifficulty)}
+        onClick={handleStart}
         size="lg"
         className="min-w-[200px] text-lg h-14"
       >
@@ -94,11 +112,24 @@ export function HomeScreen({ onStart }: HomeScreenProps) {
       </Button>
 
       {/* Quick info */}
-      <div className="text-center text-sm text-muted-foreground max-w-md">
+      <div className="text-center text-sm text-muted-foreground max-w-md space-y-3">
         <p>
           Arrange cards to create equations. Find the arrangements that produce
           the lowest value (dusk) and highest value (dawn).
         </p>
+        <div className="rounded-xl border border-border bg-muted/30 p-4 text-left">
+          <div className="text-xs font-semibold uppercase text-muted-foreground tracking-wider mb-2">
+            How to Play
+          </div>
+          <ul className="space-y-1 text-sm text-muted-foreground">
+            <li>First card ignores its operator.</li>
+            <li>Evaluate left-to-right (no PEMDAS).</li>
+            <li>Find both dusk and dawn to win.</li>
+          </ul>
+          <div className="mt-2 text-xs text-muted-foreground">
+            Example: 9, +1, ÷2, -5 → 9 → 10 → 5 → 0
+          </div>
+        </div>
       </div>
     </div>
   );
