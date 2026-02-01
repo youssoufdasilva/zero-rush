@@ -69,6 +69,7 @@ export function GameBoard({ difficulty, onBack }: GameBoardProps) {
   const submitButtonRef = useRef<HTMLButtonElement>(null);
   const autoSubmitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const prevCanSubmitRef = useRef(false);
+  const audioContextRef = useRef<AudioContext | null>(null);
 
   const {
     handCards,
@@ -157,6 +158,42 @@ export function GameBoard({ difficulty, onBack }: GameBoardProps) {
     }
   }
 
+  const playDuplicateSound = useCallback(() => {
+    if (typeof window === "undefined") return;
+    const AudioContextCtor =
+      window.AudioContext ||
+      (window as typeof window & { webkitAudioContext?: typeof AudioContext })
+        .webkitAudioContext;
+
+    if (!AudioContextCtor) return;
+
+    if (!audioContextRef.current) {
+      audioContextRef.current = new AudioContextCtor();
+    }
+
+    const context = audioContextRef.current;
+
+    if (context.state === "suspended") {
+      context.resume().catch(() => undefined);
+    }
+
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+
+    oscillator.type = "sine";
+    oscillator.frequency.value = 320;
+
+    gain.gain.value = 0.0001;
+    gain.gain.exponentialRampToValueAtTime(0.12, context.currentTime + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 0.18);
+
+    oscillator.connect(gain);
+    gain.connect(context.destination);
+
+    oscillator.start();
+    oscillator.stop(context.currentTime + 0.2);
+  }, []);
+
   const handleSubmit = useCallback(() => {
     const result = submitAttempt();
 
@@ -164,6 +201,7 @@ export function GameBoard({ difficulty, onBack }: GameBoardProps) {
       // Trigger shake and flash animations
       setShakeSubmit(true);
       setFlashHistory(true);
+      playDuplicateSound();
 
       // Reset animations after they complete
       setTimeout(() => setShakeSubmit(false), 500);
@@ -184,6 +222,7 @@ export function GameBoard({ difficulty, onBack }: GameBoardProps) {
     foundDusk,
     foundDawn,
     clearArrangement,
+    playDuplicateSound,
   ]);
 
   // Auto-submit when enabled and ready
