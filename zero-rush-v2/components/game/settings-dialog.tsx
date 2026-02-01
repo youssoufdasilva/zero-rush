@@ -85,6 +85,16 @@ export function SettingsDialog({ settings, onSettingsChange }: SettingsDialogPro
                 }
               />
 
+              {/* Sound effects toggle */}
+              <SettingToggle
+                label="Sound Effects"
+                description="Play sounds for actions and milestones"
+                checked={settings.soundEffects}
+                onChange={(checked) =>
+                  onSettingsChange({ ...settings, soundEffects: checked })
+                }
+              />
+
               {/* Clear after submit toggle */}
               <SettingToggle
                 label="Clear After Submit"

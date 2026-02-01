@@ -29,6 +29,7 @@ import { VictoryModal, VictoryBanner } from "./victory-modal";
 import { cardToString } from "@/lib/game/evaluate";
 import { OPERATOR_DISPLAY } from "@/lib/game/constants";
 import { cn } from "@/lib/utils";
+import { useSoundEffects } from "@/lib/hooks/use-sound-effects";
 
 export interface GameSettings {
   showTargetValues: boolean;
@@ -39,6 +40,7 @@ export interface GameSettings {
   controlsStyle: "text-icons" | "icons-only";
   historyPlacement: "inline" | "drawer";
   cardScaling: "scale" | "scroll";
+  soundEffects: boolean;
 }
 
 const DEFAULT_SETTINGS: GameSettings = {
@@ -50,6 +52,7 @@ const DEFAULT_SETTINGS: GameSettings = {
   controlsStyle: "text-icons",
   historyPlacement: "drawer",
   cardScaling: "scale",
+  soundEffects: true,
 };
 const SETTINGS_STORAGE_KEY = "zero-rush.gameSettings";
 
@@ -69,7 +72,9 @@ export function GameBoard({ difficulty, onBack }: GameBoardProps) {
   const submitButtonRef = useRef<HTMLButtonElement>(null);
   const autoSubmitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const prevCanSubmitRef = useRef(false);
-  const audioContextRef = useRef<AudioContext | null>(null);
+  const prevCompleteRef = useRef(false);
+
+  const { play } = useSoundEffects(settings.soundEffects);
 
   const {
     handCards,
@@ -158,42 +163,6 @@ export function GameBoard({ difficulty, onBack }: GameBoardProps) {
     }
   }
 
-  const playDuplicateSound = useCallback(() => {
-    if (typeof window === "undefined") return;
-    const AudioContextCtor =
-      window.AudioContext ||
-      (window as typeof window & { webkitAudioContext?: typeof AudioContext })
-        .webkitAudioContext;
-
-    if (!AudioContextCtor) return;
-
-    if (!audioContextRef.current) {
-      audioContextRef.current = new AudioContextCtor();
-    }
-
-    const context = audioContextRef.current;
-
-    if (context.state === "suspended") {
-      context.resume().catch(() => undefined);
-    }
-
-    const oscillator = context.createOscillator();
-    const gain = context.createGain();
-
-    oscillator.type = "sine";
-    oscillator.frequency.value = 320;
-
-    gain.gain.value = 0.0001;
-    gain.gain.exponentialRampToValueAtTime(0.12, context.currentTime + 0.01);
-    gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 0.18);
-
-    oscillator.connect(gain);
-    gain.connect(context.destination);
-
-    oscillator.start();
-    oscillator.stop(context.currentTime + 0.2);
-  }, []);
-
   const handleSubmit = useCallback(() => {
     const result = submitAttempt();
 
@@ -201,12 +170,26 @@ export function GameBoard({ difficulty, onBack }: GameBoardProps) {
       // Trigger shake and flash animations
       setShakeSubmit(true);
       setFlashHistory(true);
-      playDuplicateSound();
+      play("duplicate");
 
       // Reset animations after they complete
       setTimeout(() => setShakeSubmit(false), 500);
       setTimeout(() => setFlashHistory(false), 600);
       return;
+    }
+
+    if (result.value === null) {
+      play("submitInvalid");
+    } else {
+      play("submitValid");
+    }
+
+    if (result.isDusk) {
+      play("duskFound");
+    }
+
+    if (result.isDawn) {
+      play("dawnFound");
     }
 
     const completesPuzzle =
@@ -222,8 +205,35 @@ export function GameBoard({ difficulty, onBack }: GameBoardProps) {
     foundDusk,
     foundDawn,
     clearArrangement,
-    playDuplicateSound,
+    play,
   ]);
+
+  const handleAddCard = useCallback(
+    (card: typeof handCards[number]) => {
+      play("cardAdd");
+      addToArrangement(card);
+    },
+    [addToArrangement, play]
+  );
+
+  const handleRemoveCard = useCallback(
+    (card: typeof arrangementCards[number]) => {
+      play("cardRemove");
+      removeFromArrangement(card);
+    },
+    [removeFromArrangement, play]
+  );
+
+  const handleClear = useCallback(() => {
+    if (arrangementCards.length === 0) return;
+    play("clear");
+    clearArrangement();
+  }, [arrangementCards.length, clearArrangement, play]);
+
+  const handleNewPuzzle = useCallback(() => {
+    play("newPuzzle");
+    generateNewPuzzle();
+  }, [generateNewPuzzle, play]);
 
   // Auto-submit when enabled and ready
   useEffect(() => {
@@ -253,6 +263,17 @@ export function GameBoard({ difficulty, onBack }: GameBoardProps) {
       }
     };
   }, [settings.autoSubmit, canSubmit, isComplete, handleSubmit]);
+
+  useEffect(() => {
+    if (isComplete && !prevCompleteRef.current) {
+      play("puzzleComplete");
+      prevCompleteRef.current = true;
+      return;
+    }
+    if (!isComplete) {
+      prevCompleteRef.current = false;
+    }
+  }, [isComplete, play]);
 
   // Build equation display string (first card shows just number, no operator)
   const equationDisplay = arrangementCards
@@ -307,7 +328,7 @@ export function GameBoard({ difficulty, onBack }: GameBoardProps) {
         attempts={attempts}
         duskValue={puzzleResult.dusk.result}
         dawnValue={puzzleResult.dawn.result}
-        onNewPuzzle={generateNewPuzzle}
+        onNewPuzzle={handleNewPuzzle}
       />
 
       {/* History Drawer (when in drawer mode) */}
@@ -396,8 +417,8 @@ export function GameBoard({ difficulty, onBack }: GameBoardProps) {
         <div className="w-full flex justify-center mb-4">
           <GameControlsCompact
             onSubmit={handleSubmit}
-            onClear={clearArrangement}
-            onNewPuzzle={generateNewPuzzle}
+            onClear={handleClear}
+            onNewPuzzle={handleNewPuzzle}
             attempts={attempts}
             isComplete={isComplete}
             canSubmit={canSubmit}
@@ -460,7 +481,7 @@ export function GameBoard({ difficulty, onBack }: GameBoardProps) {
                       isFirst={index === 0}
                       disabled={isComplete}
                       draggable={true}
-                      onClick={() => removeFromArrangement(card)}
+                      onClick={() => handleRemoveCard(card)}
                       size={shouldScaleCards ? "small" : "normal"}
                     />
                   ))
@@ -503,7 +524,7 @@ export function GameBoard({ difficulty, onBack }: GameBoardProps) {
         >
           <Hand
             cards={handCards}
-            onCardTap={addToArrangement}
+            onCardTap={handleAddCard}
             disabled={isComplete}
             size={shouldScaleCards ? "small" : "normal"}
             scrollable={shouldScrollCards}
